@@ -1,0 +1,36 @@
+.navbar-light {
+    background-color: white;
+    width: 100%;
+}
+
+.navbar {
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+#whiteSpace {
+    width:50px
+}
+
+.narbarButton {
+    background-color: white;
+    color: black;
+    border: none;
+}
+
+.narbarButton a {
+    color: black;
+}
+
+.narbarButton .active {
+    margin-top: 9px;
+    border-radius: 15px;
+    border: 2px solid black;
+    background-color: white;
+    padding: 8px;
+    display: block;
+}
+
+.back11 {
+    background-image: linear-gradient(to top,rgba(0, 0, 255, 0.005), rgba(0, 0, 255, 0));
+}

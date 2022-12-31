@@ -1,1 +1,2087 @@
-<p>search works!</p>
+<script src="https://kit.fontawesome.com/75df4764ea.js" crossorigin="anonymous"></script>
+<div id="fb-root"></div>
+<script async defer crossorigin="anonymous"
+    src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v15.0&appId=392377741360091&autoLogAppEvents=1"
+    nonce="spheWdLA"></script>
+<link rel="me" href="https://twitter.com/twitterdev">
+
+
+<div class="back back1">
+    <div class="back2">
+        <div class="container-md forSearchBox">
+            <br><br>
+            <div class="searchContainer">
+                <div class="container-fluid  fillIn">
+                    <div class="row text-center">
+                        <div class="col- searchBoxTitle">Business search</div>
+                    </div>
+                    <br>
+                    <form id="Crazy" #searchForm="ngForm" ngNativeValidate (submit)="onSubmit(searchForm)">
+                        <div class="row">
+                            <div class="col kW">
+                                <label for="kWord" class="form-label">Keyword</label>
+                                <input class="form-control" type="text" id="kWord" required ngModel name="kWord"
+                                    matInput [formControl]="myControl" [matAutocomplete]="auto">
+                                <mat-autocomplete #auto="matAutocomplete">
+                                    <mat-option *ngFor="let item of options" [value]="item">
+                                        {{item}}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col dist">
+                                <label for="dist" class="form-label">Distance</label>
+                                <input type="text" id="dist" placeholder="10" ngModel name="dist">
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col cate">
+                                <label for="cate" class="form-label">Category</label>
+                                <br>
+                                <select class="cate" id="cate" size="1" name="cate">
+                                    <option value="all" selected>&nbsp;&nbsp;Default</option>
+                                    <option value="arts">&nbsp;&nbsp;Arts & Entertainment</option>
+                                    <option value="health">&nbsp;&nbsp;Health & Medical</option>
+                                    <option value="hotelstravel">&nbsp;&nbsp;Hotels & Travel</option>
+                                    <option value="food">&nbsp;&nbsp;Food</option>
+                                    <option value="professional">&nbsp;&nbsp;Professional Services</option>
+                                </select>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col- loc">
+                                <label for="loc" class="form-label">Location</label><br>
+                                <input class="form-control" type="text" id="loc" required ngModel name="loc">
+                            </div>
+                        </div>
+
+                        <div class="row" style="margin-top: 10px;">
+                            <div class="col- checkBox">
+                                <input class="form-check-control" type="checkbox" id="cB" (change)="locControl($event)"
+                                    ngModel name="cB">
+                                <label class="form-check-label" for="cB">&nbsp;&nbsp;&nbsp;Auto-detect my
+                                    location</label>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row text-center" style="margin-bottom: 10px;">
+                            <div class="col-">
+                                <button class="btn btn-danger redB" type="submit">Submit</button>
+                                <button class="btn btn-primary blueB" type="button" (click)="clearForm()">Clear</button>
+                            </div>
+                        </div>
+                        <br>
+                    </form>
+                </div>
+            </div>
+            <br><br>
+            <div class="invalidInput" id="invalidLog"></div>
+        </div>
+        <br>
+        <div class="section3" id="part3">
+            <table class="table table-striped">
+                <thead class="text-center" id="dataTableHead"></thead>
+                <tbody class="text-center" id="dataTable"></tbody>
+            </table>
+        </div>
+
+        <div id="lastone">
+            <div id="d0" class="container-md text-center section4">
+                <br>
+                <div class="container-md">
+                    <button style="float: left; border: none; width: 24px; height: 24px; background-color: white;"
+                        type="button" (click)="exitDetail()">
+                        <a href="search#dataTableHead" style="color: black; text-decoration: none;">
+                            <mat-icon>keyboard_backspace</mat-icon>
+                        </a>
+                    </button>
+                </div>
+                <br><br>
+                <div class="first_info" *ngFor="let detail of detailCard; let i = index;">
+                    <div class="text-center" id="d_name">{{detail.detailName}}</div>
+                </div>
+                <br>
+                <div class="tabDetail">
+                    <mat-tab-group mat-align-tabs="center" [(selectedIndex)]="tabIndex">
+                        <mat-tab label="Business detail">
+                            <br>
+                            <div class="d_info row" style="width: 100%;">
+                                <div class="col" style="padding: 0;">
+                                    <div [innerHtml]="d_1html"></div>
+                                    <div [innerHtml]="d_2html"></div>
+                                    <div [innerHtml]="d_3html"></div>
+                                </div>
+                                <div class="col">
+                                    <div [innerHtml]="d_4html"></div>
+                                    <div [innerHtml]="d_5html"></div>
+                                    <div [innerHtml]="d_6html"></div>
+                                </div>
+                            </div>
+                            <div *ngFor="let detail of detailCard;">
+                                <button #modalButton class="btn" type="button" (click)="openBook(detail.detailName)"
+                                    [ngClass]="action =='Reserve Now' ? 'btn-danger reserveB': 'btn-primary'">{{action}}</button>
+                            </div>
+                            <br><br>
+                            <div class="shareIcon" *ngFor="let detail of detailfb;">
+                                Share on:&nbsp;&nbsp;&nbsp;
+                                <a target="_blank"
+                                    href="https://twitter.com/intent/tweet?text=Check {{detail.twitterName}} on Yelp.&url={{detail.detailName}}">
+                                    <fa-icon [icon]="faTwitter"
+                                        style="display: inline-block; color: #3490ff; font-size: 28px;"></fa-icon>
+                                </a>
+                                &nbsp;&nbsp;
+                                <div class="fb-share-button" data-href="https://developers.facebook.com/docs/plugins/"
+                                    data-layout="button" data-size="small" style="display: inline;">
+                                    <a target="_blank"
+                                        href="https://www.facebook.com/sharer/sharer.php?u={{detail.detailName}}"
+                                        class="fb-xfbml-parse-ignore">
+                                        <fa-icon [icon]="faFacebookSquare"
+                                            style="display: inline-block; color: #0700ff; font-size: 28px;">
+                                        </fa-icon>
+                                    </a>
+                                </div>
+                            </div>
+                            <br>
+                            <div id="carouselExampleControls" class="carousel slide" *ngFor="let pic of detailPic;">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item active">
+                                        <img src="{{pic.pic1}}" class="d-block w-100" alt="">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="{{pic.pic2}}" class="d-block w-100" alt="">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="{{pic.pic3}}" class="d-block w-100" alt="">
+                                    </div>
+                                </div>
+                                <button class="carousel-control-prev" type="button"
+                                    data-bs-target="#carouselExampleControls" data-bs-slide="prev"
+                                    (click)="startAuto('carouselExampleControls')">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button"
+                                    data-bs-target="#carouselExampleControls" data-bs-slide="next"
+                                    (click)="startAuto('carouselExampleControls')">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Map location">
+                            <div class="my-google-map">
+                                <google-map [width]="null" [height]="null" [center]="{lat: maplat, lng: maplng}"
+                                    [options]="mapOptions">
+                                    <map-marker [position]="{lat: maplat, lng: maplng}"></map-marker>
+                                </google-map>
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Reviews">
+                            <table class="table table-striped">
+                                <tbody id="reviewTable" style="text-align: left;">
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName[0]}}</strong><br>
+                                            Rating: {{reviewRate[0]}}/5<br><br>
+                                            {{reviewText[0]}}<br><br>
+                                            {{reviewTime[0]}}<br><br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName1[0]}}</strong><br>
+                                            Rating: {{reviewRate1[0]}}/5<br><br>
+                                            {{reviewText1[0]}}<br><br>
+                                            {{reviewTime1[0]}}<br><br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName2[0]}}</strong><br>
+                                            Rating: {{reviewRate2[0]}}/5<br><br>
+                                            {{reviewText2[0]}}<br><br>
+                                            {{reviewTime2[0]}}<br><br>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </mat-tab>
+                    </mat-tab-group>
+                    <div class="modal" id="exampleModal" #exampleModal *ngFor="let detail of detailCard;" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2 class="modal-title" id="exampleModalLabel">Reservation form</h2>
+                                </div>
+                                <div class="modal-body">
+                                    <p style="font-size: 18px">{{detail.detailName}}</p>
+                                    <form [formGroup]="reserveForm" (ngSubmit)="toBooking(detail.detailName)">
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Email</label>
+                                            <input type="email" class="form-control" formControlName="emailtext"
+                                                [ngClass]="{'is-invalid':submitted && reserveForm.controls['emailtext'].errors}">
+                                            <div *ngIf="submitted && reserveForm.controls['emailtext'].errors && !reserveForm.controls['emailtext'].dirty"
+                                                class="text-danger" style="text-align:left">Email is
+                                                required</div>
+                                            <div *ngIf="submitted && reserveForm.controls['emailtext'].errors && (reserveForm.controls['emailtext'].dirty || reserveForm.controls['emailtext'].touched)"
+                                                class="text-danger" style="text-align:left">Email must be a valid email
+                                                address</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Date</label>
+                                            <input type="date" class="form-control" formControlName="datetext"
+                                                [ngClass]="{'is-invalid':submitted && reserveForm.controls['datetext'].errors}">
+                                            <div *ngIf="submitted && reserveForm.controls['datetext'].errors"
+                                                class="text-danger" style="text-align:left">Date is required
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Time</label>
+                                            <p>&nbsp;</p>
+                                            <div class="row" style="padding-left: 12px; width:40vh">
+                                                <div class="col-3" style="padding-right: 0px; padding-left: 0px">
+                                                    <select class="form-select" formControlName="hourtext"
+                                                        [ngClass]="{'is-invalid':submitted && reserveForm.controls['hourtext'].errors}">
+                                                        <option style="display:none"></option>
+                                                        <option value="10">10</option>
+                                                        <option value="11">11</option>
+                                                        <option value="12">12</option>
+                                                        <option value="13">13</option>
+                                                        <option value="14">14</option>
+                                                        <option value="15">15</option>
+                                                        <option value="16">16</option>
+                                                        <option value="17">17</option>
+                                                    </select>
+                                                </div>
+                                                &nbsp;&nbsp;&nbsp;:&nbsp;
+                                                <div class="col-3" style="padding-right: 0px; padding-left: 0px">
+                                                    <select class="form-select" formControlName="mintext"
+                                                        [ngClass]="{'is-invalid':submitted && reserveForm.controls['mintext'].errors}">
+                                                        <option style="display:none"></option>
+                                                        <option value="00">00</option>
+                                                        <option value="15">15</option>
+                                                        <option value="30">30</option>
+                                                        <option value="45">45</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-1" style="padding-right: 0px; padding-left: 6px">
+                                                    <fa-icon [icon]="faClock" style="padding-top: 1vh; display: block;">
+                                                    </fa-icon>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-danger"
+                                            (click)="changeButton()">Submit</button>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button id="closeModalB" type="button" class="btn btn-dark"
+                                        data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="d1" class="container-md text-center section4">
+                <br>
+                <div class="container-md">
+                    <button style="float: left; border: none; width: 24px; height: 24px; background-color: white;"
+                        type="button" (click)="exitDetail()">
+                        <a href="search#dataTableHead" style="color: black; text-decoration: none;">
+                            <mat-icon>keyboard_backspace</mat-icon>
+                        </a>
+                    </button>
+                </div>
+                <br><br>
+                <div class="first_info" *ngFor="let detail of detailCard1; let i = index;">
+                    <div class="text-center" id="d_name">{{detail.detailName}}</div>
+                </div>
+                <br>
+                <div class="tabDetail">
+                    <mat-tab-group mat-align-tabs="center" [(selectedIndex)]="tabIndex">
+                        <mat-tab label="Business detail">
+                            <br>
+                            <div class="d_info row" style="width: 100%;">
+                                <div class="col" style="padding: 0;">
+                                    <div [innerHtml]="d_11html"></div>
+                                    <div [innerHtml]="d_12html"></div>
+                                    <div [innerHtml]="d_13html"></div>
+                                </div>
+                                <div class="col">
+                                    <div [innerHtml]="d_14html"></div>
+                                    <div [innerHtml]="d_15html"></div>
+                                    <div [innerHtml]="d_16html"></div>
+                                </div>
+                            </div>
+                            <div *ngFor="let detail of detailCard1;">
+                                <button #modalButton1 class="btn" type="button" (click)="openBook1(detail.detailName)"
+                                    [ngClass]="action1 =='Reserve Now' ? 'btn-danger reserveB': 'btn-primary'">{{action1}}</button>
+                            </div>
+                            <br><br>
+                            <div class="shareIcon" *ngFor="let detail of detailfb1;">
+                                Share on:&nbsp;&nbsp;&nbsp;
+                                <a target="_blank"
+                                    href="https://twitter.com/intent/tweet?text=Check {{detail.twitterName}} on Yelp.&url={{detail.detailName}}">
+                                    <fa-icon [icon]="faTwitter"
+                                        style="display: inline-block; color: #3490ff; font-size: 28px;"></fa-icon>
+                                </a>
+                                &nbsp;&nbsp;
+                                <div class="fb-share-button" data-href="https://developers.facebook.com/docs/plugins/"
+                                    data-layout="button" data-size="small" style="display: inline;">
+                                    <a target="_blank"
+                                        href="https://www.facebook.com/sharer/sharer.php?u={{detail.detailName}}"
+                                        class="fb-xfbml-parse-ignore">
+                                        <fa-icon [icon]="faFacebookSquare"
+                                            style="display: inline-block; color: #0700ff; font-size: 28px;">
+                                        </fa-icon>
+                                    </a>
+                                </div>
+                            </div>
+                            <br>
+                            <div id="carouselExampleControls1" class="carousel slide" *ngFor="let pic of detailPic1;">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item active">
+                                        <img src="{{pic.pic1}}" class="d-block w-100" alt="">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="{{pic.pic2}}" class="d-block w-100" alt="">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="{{pic.pic3}}" class="d-block w-100" alt="">
+                                    </div>
+                                </div>
+                                <button class="carousel-control-prev" type="button"
+                                    data-bs-target="#carouselExampleControls1" data-bs-slide="prev"
+                                    (click)="startAuto('carouselExampleControls1')">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button"
+                                    data-bs-target="#carouselExampleControls1" data-bs-slide="next"
+                                    (click)="startAuto('carouselExampleControls1')">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Map location">
+                            <div class="my-google-map">
+                                <google-map [width]="null" [height]="null" [center]="{lat: maplat1, lng: maplng1}"
+                                    [options]="mapOptions">
+                                    <map-marker [position]="{lat: maplat1, lng: maplng1}"></map-marker>
+                                </google-map>
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Reviews">
+                            <table class="table table-striped">
+                                <tbody id="reviewTable" style="text-align: left;">
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName[1]}}</strong><br>
+                                            Rating: {{reviewRate[1]}}/5<br><br>
+                                            {{reviewText[1]}}<br><br>
+                                            {{reviewTime[1]}}<br><br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName1[1]}}</strong><br>
+                                            Rating: {{reviewRate1[1]}}/5<br><br>
+                                            {{reviewText1[1]}}<br><br>
+                                            {{reviewTime1[1]}}<br><br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName2[1]}}</strong><br>
+                                            Rating: {{reviewRate2[1]}}/5<br><br>
+                                            {{reviewText2[1]}}<br><br>
+                                            {{reviewTime2[1]}}<br><br>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </mat-tab>
+                    </mat-tab-group>
+                    <div class="modal" id="exampleModal1" #exampleModal1 *ngFor="let detail of detailCard1;"
+                        tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2 class="modal-title" id="exampleModalLabel1">Reservation form</h2>
+                                </div>
+                                <div class="modal-body">
+                                    <p style="font-size: 18px">{{detail.detailName}}</p>
+                                    <form [formGroup]="reserveForm1" (ngSubmit)="toBooking1(detail.detailName)">
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Email</label>
+                                            <input type="email" class="form-control" formControlName="emailtext"
+                                                [ngClass]="{'is-invalid':submitted1 && reserveForm1.controls['emailtext'].errors}">
+                                            <div *ngIf="submitted1 && reserveForm1.controls['emailtext'].errors && !reserveForm1.controls['emailtext'].dirty"
+                                                class="text-danger" style="text-align:left">Email is
+                                                required</div>
+                                            <div *ngIf="submitted1 && reserveForm1.controls['emailtext'].errors && (reserveForm1.controls['emailtext'].dirty || reserveForm1.controls['emailtext'].touched)"
+                                                class="text-danger" style="text-align:left">Email must be a valid email
+                                                address</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Date</label>
+                                            <input type="date" class="form-control" formControlName="datetext"
+                                                [ngClass]="{'is-invalid':submitted1 && reserveForm1.controls['datetext'].errors}">
+                                            <div *ngIf="submitted1 && reserveForm1.controls['datetext'].errors"
+                                                class="text-danger" style="text-align:left">Date is required
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Time</label>
+                                            <p>&nbsp;</p>
+                                            <div class="row" style="padding-left: 12px; width:40vh">
+                                                <div class="col-3" style="padding-right: 0px; padding-left: 0px">
+                                                    <select class="form-select" formControlName="hourtext"
+                                                        [ngClass]="{'is-invalid':submitted1 && reserveForm1.controls['hourtext'].errors}">
+                                                        <option style="display:none"></option>
+                                                        <option value="10">10</option>
+                                                        <option value="11">11</option>
+                                                        <option value="12">12</option>
+                                                        <option value="13">13</option>
+                                                        <option value="14">14</option>
+                                                        <option value="15">15</option>
+                                                        <option value="16">16</option>
+                                                        <option value="17">17</option>
+                                                    </select>
+                                                </div>
+                                                &nbsp;&nbsp;&nbsp;:&nbsp;
+                                                <div class="col-3" style="padding-right: 0px; padding-left: 0px">
+                                                    <select class="form-select" formControlName="mintext"
+                                                        [ngClass]="{'is-invalid':submitted1 && reserveForm1.controls['mintext'].errors}">
+                                                        <option style="display:none"></option>
+                                                        <option value="00">00</option>
+                                                        <option value="15">15</option>
+                                                        <option value="30">30</option>
+                                                        <option value="45">45</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-1" style="padding-right: 0px; padding-left: 6px">
+                                                    <fa-icon [icon]="faClock" style="padding-top: 1vh; display: block;">
+                                                    </fa-icon>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-danger"
+                                            (click)="changeButton1()">Submit</button>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button id="closeModalB1" type="button" class="btn btn-dark"
+                                        data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="d2" class="container-md text-center section4">
+                <br>
+                <div class="container-md">
+                    <button style="float: left; border: none; width: 24px; height: 24px; background-color: white;"
+                        type="button" (click)="exitDetail()">
+                        <a href="search#dataTableHead" style="color: black; text-decoration: none;">
+                            <mat-icon>keyboard_backspace</mat-icon>
+                        </a>
+                    </button>
+                </div>
+                <br><br>
+                <div class="first_info" *ngFor="let detail of detailCard2; let i = index;">
+                    <div class="text-center" id="d_name">{{detail.detailName}}</div>
+                </div>
+                <br>
+                <div class="tabDetail">
+                    <mat-tab-group mat-align-tabs="center" [(selectedIndex)]="tabIndex">
+                        <mat-tab label="Business detail">
+                            <br>
+                            <div class="d_info row" style="width: 100%;">
+                                <div class="col" style="padding: 0;">
+                                    <div [innerHtml]="d_21html"></div>
+                                    <div [innerHtml]="d_22html"></div>
+                                    <div [innerHtml]="d_23html"></div>
+                                </div>
+                                <div class="col">
+                                    <div [innerHtml]="d_24html"></div>
+                                    <div [innerHtml]="d_25html"></div>
+                                    <div [innerHtml]="d_26html"></div>
+                                </div>
+                            </div>
+                            <div *ngFor="let detail of detailCard2;">
+                                <button #modalButton2 class="btn" type="button" (click)="openBook2(detail.detailName)"
+                                    [ngClass]="action2 =='Reserve Now' ? 'btn-danger reserveB': 'btn-primary'">{{action2}}</button>
+                            </div>
+                            <br><br>
+                            <div class="shareIcon" *ngFor="let detail of detailfb2;">
+                                Share on:&nbsp;&nbsp;&nbsp;
+                                <a target="_blank"
+                                    href="https://twitter.com/intent/tweet?text=Check {{detail.twitterName}} on Yelp.&url={{detail.detailName}}">
+                                    <fa-icon [icon]="faTwitter"
+                                        style="display: inline-block; color: #3490ff; font-size: 28px;"></fa-icon>
+                                </a>
+                                &nbsp;&nbsp;
+                                <div class="fb-share-button" data-href="https://developers.facebook.com/docs/plugins/"
+                                    data-layout="button" data-size="small" style="display: inline;">
+                                    <a target="_blank"
+                                        href="https://www.facebook.com/sharer/sharer.php?u={{detail.detailName}}"
+                                        class="fb-xfbml-parse-ignore">
+                                        <fa-icon [icon]="faFacebookSquare"
+                                            style="display: inline-block; color: #0700ff; font-size: 28px;">
+                                        </fa-icon>
+                                    </a>
+                                </div>
+                            </div>
+                            <br>
+                            <div id="carouselExampleControls2" class="carousel slide" *ngFor="let pic of detailPic2;">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item active">
+                                        <img src="{{pic.pic1}}" class="d-block w-100" alt="">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="{{pic.pic2}}" class="d-block w-100" alt="">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="{{pic.pic3}}" class="d-block w-100" alt="">
+                                    </div>
+                                </div>
+                                <button class="carousel-control-prev" type="button"
+                                    data-bs-target="#carouselExampleControls2" data-bs-slide="prev"
+                                    (click)="startAuto('carouselExampleControls2')">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button"
+                                    data-bs-target="#carouselExampleControls2" data-bs-slide="next"
+                                    (click)="startAuto('carouselExampleControls2')">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Map location">
+                            <div class="my-google-map">
+                                <google-map [width]="null" [height]="null" [center]="{lat: maplat2, lng: maplng2}"
+                                    [options]="mapOptions">
+                                    <map-marker [position]="{lat: maplat2, lng: maplng2}"></map-marker>
+                                </google-map>
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Reviews">
+                            <table class="table table-striped">
+                                <tbody id="reviewTable" style="text-align: left;">
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName[2]}}</strong><br>
+                                            Rating: {{reviewRate[2]}}/5<br><br>
+                                            {{reviewText[2]}}<br><br>
+                                            {{reviewTime[2]}}<br><br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName1[2]}}</strong><br>
+                                            Rating: {{reviewRate1[2]}}/5<br><br>
+                                            {{reviewText1[2]}}<br><br>
+                                            {{reviewTime1[2]}}<br><br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName2[2]}}</strong><br>
+                                            Rating: {{reviewRate2[2]}}/5<br><br>
+                                            {{reviewText2[2]}}<br><br>
+                                            {{reviewTime2[2]}}<br><br>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </mat-tab>
+                    </mat-tab-group>
+                    <div class="modal" id="exampleModal2" #exampleModal2 *ngFor="let detail of detailCard2;"
+                        tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2 class="modal-title" id="exampleModalLabel2">Reservation form</h2>
+                                </div>
+                                <div class="modal-body">
+                                    <p style="font-size: 18px">{{detail.detailName}}</p>
+                                    <form [formGroup]="reserveForm2" (ngSubmit)="toBooking2(detail.detailName)">
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Email</label>
+                                            <input type="email" class="form-control" formControlName="emailtext"
+                                                [ngClass]="{'is-invalid':submitted2 && reserveForm2.controls['emailtext'].errors}">
+                                            <div *ngIf="submitted2 && reserveForm2.controls['emailtext'].errors && !reserveForm2.controls['emailtext'].dirty"
+                                                class="text-danger" style="text-align:left">Email is
+                                                required</div>
+                                            <div *ngIf="submitted2 && reserveForm2.controls['emailtext'].errors && (reserveForm2.controls['emailtext'].dirty || reserveForm2.controls['emailtext'].touched)"
+                                                class="text-danger" style="text-align:left">Email must be a valid email
+                                                address</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Date</label>
+                                            <input type="date" class="form-control" formControlName="datetext"
+                                                [ngClass]="{'is-invalid':submitted2 && reserveForm2.controls['datetext'].errors}">
+                                            <div *ngIf="submitted2 && reserveForm2.controls['datetext'].errors"
+                                                class="text-danger" style="text-align:left">Date is required
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Time</label>
+                                            <p>&nbsp;</p>
+                                            <div class="row" style="padding-left: 12px; width:40vh">
+                                                <div class="col-3" style="padding-right: 0px; padding-left: 0px">
+                                                    <select class="form-select" formControlName="hourtext"
+                                                        [ngClass]="{'is-invalid':submitted2 && reserveForm2.controls['hourtext'].errors}">
+                                                        <option style="display:none"></option>
+                                                        <option value="10">10</option>
+                                                        <option value="11">11</option>
+                                                        <option value="12">12</option>
+                                                        <option value="13">13</option>
+                                                        <option value="14">14</option>
+                                                        <option value="15">15</option>
+                                                        <option value="16">16</option>
+                                                        <option value="17">17</option>
+                                                    </select>
+                                                </div>
+                                                &nbsp;&nbsp;&nbsp;:&nbsp;
+                                                <div class="col-3" style="padding-right: 0px; padding-left: 0px">
+                                                    <select class="form-select" formControlName="mintext"
+                                                        [ngClass]="{'is-invalid':submitted2 && reserveForm2.controls['mintext'].errors}">
+                                                        <option style="display:none"></option>
+                                                        <option value="00">00</option>
+                                                        <option value="15">15</option>
+                                                        <option value="30">30</option>
+                                                        <option value="45">45</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-1" style="padding-right: 0px; padding-left: 6px">
+                                                    <fa-icon [icon]="faClock" style="padding-top: 1vh; display: block;">
+                                                    </fa-icon>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-danger"
+                                            (click)="changeButton2()">Submit</button>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button id="closeModalB2" type="button" class="btn btn-dark"
+                                        data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="d3" class="container-md text-center section4">
+                <br>
+                <div class="container-md">
+                    <button style="float: left; border: none; width: 24px; height: 24px; background-color: white;"
+                        type="button" (click)="exitDetail()">
+                        <a href="search#dataTableHead" style="color: black; text-decoration: none;">
+                            <mat-icon>keyboard_backspace</mat-icon>
+                        </a>
+                    </button>
+                </div>
+                <br><br>
+                <div class="first_info" *ngFor="let detail of detailCard3; let i = index;">
+                    <div class="text-center" id="d_name">{{detail.detailName}}</div>
+                </div>
+                <br>
+                <div class="tabDetail">
+                    <mat-tab-group mat-align-tabs="center" [(selectedIndex)]="tabIndex">
+                        <mat-tab label="Business detail">
+                            <br>
+                            <div class="d_info row" style="width: 100%;">
+                                <div class="col" style="padding: 0;">
+                                    <div [innerHtml]="d_31html"></div>
+                                    <div [innerHtml]="d_32html"></div>
+                                    <div [innerHtml]="d_33html"></div>
+                                </div>
+                                <div class="col">
+                                    <div [innerHtml]="d_34html"></div>
+                                    <div [innerHtml]="d_35html"></div>
+                                    <div [innerHtml]="d_36html"></div>
+                                </div>
+                            </div>
+                            <div *ngFor="let detail of detailCard3;">
+                                <button #modalButton3 class="btn" type="button" (click)="openBook3(detail.detailName)"
+                                    [ngClass]="action3 =='Reserve Now' ? 'btn-danger reserveB': 'btn-primary'">{{action3}}</button>
+                            </div>
+                            <br><br>
+                            <div class="shareIcon" *ngFor="let detail of detailfb3;">
+                                Share on:&nbsp;&nbsp;&nbsp;
+                                <a target="_blank"
+                                    href="https://twitter.com/intent/tweet?text=Check {{detail.twitterName}} on Yelp.&url={{detail.detailName}}">
+                                    <fa-icon [icon]="faTwitter"
+                                        style="display: inline-block; color: #3490ff; font-size: 28px;"></fa-icon>
+                                </a>
+                                &nbsp;&nbsp;
+                                <div class="fb-share-button" data-href="https://developers.facebook.com/docs/plugins/"
+                                    data-layout="button" data-size="small" style="display: inline;">
+                                    <a target="_blank"
+                                        href="https://www.facebook.com/sharer/sharer.php?u={{detail.detailName}}"
+                                        class="fb-xfbml-parse-ignore">
+                                        <fa-icon [icon]="faFacebookSquare"
+                                            style="display: inline-block; color: #0700ff; font-size: 28px;">
+                                        </fa-icon>
+                                    </a>
+                                </div>
+                            </div>
+                            <br>
+                            <div id="carouselExampleControls3" class="carousel slide" *ngFor="let pic of detailPic3;">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item active">
+                                        <img src="{{pic.pic1}}" class="d-block w-100" alt="">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="{{pic.pic2}}" class="d-block w-100" alt="">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="{{pic.pic3}}" class="d-block w-100" alt="">
+                                    </div>
+                                </div>
+                                <button class="carousel-control-prev" type="button"
+                                    data-bs-target="#carouselExampleControls3" data-bs-slide="prev"
+                                    (click)="startAuto('carouselExampleControls3')">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button"
+                                    data-bs-target="#carouselExampleControls3" data-bs-slide="next"
+                                    (click)="startAuto('carouselExampleControls3')">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Map location">
+                            <div class="my-google-map">
+                                <google-map [width]="null" [height]="null" [center]="{lat: maplat3, lng: maplng3}"
+                                    [options]="mapOptions">
+                                    <map-marker [position]="{lat: maplat3, lng: maplng3}"></map-marker>
+                                </google-map>
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Reviews">
+                            <table class="table table-striped">
+                                <tbody id="reviewTable" style="text-align: left;">
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName[3]}}</strong><br>
+                                            Rating: {{reviewRate[3]}}/5<br><br>
+                                            {{reviewText[3]}}<br><br>
+                                            {{reviewTime[3]}}<br><br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName1[3]}}</strong><br>
+                                            Rating: {{reviewRate1[3]}}/5<br><br>
+                                            {{reviewText1[3]}}<br><br>
+                                            {{reviewTime1[3]}}<br><br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName2[3]}}</strong><br>
+                                            Rating: {{reviewRate2[3]}}/5<br><br>
+                                            {{reviewText2[3]}}<br><br>
+                                            {{reviewTime2[3]}}<br><br>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </mat-tab>
+                    </mat-tab-group>
+                    <div class="modal" id="exampleModal3" #exampleModal3 *ngFor="let detail of detailCard3;"
+                        tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2 class="modal-title" id="exampleModalLabel3">Reservation form</h2>
+                                </div>
+                                <div class="modal-body">
+                                    <p style="font-size: 18px">{{detail.detailName}}</p>
+                                    <form [formGroup]="reserveForm3" (ngSubmit)="toBooking3(detail.detailName)">
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Email</label>
+                                            <input type="email" class="form-control" formControlName="emailtext"
+                                                [ngClass]="{'is-invalid':submitted3 && reserveForm3.controls['emailtext'].errors}">
+                                            <div *ngIf="submitted3 && reserveForm3.controls['emailtext'].errors && !reserveForm3.controls['emailtext'].dirty"
+                                                class="text-danger" style="text-align:left">Email is
+                                                required</div>
+                                            <div *ngIf="submitted3 && reserveForm3.controls['emailtext'].errors && (reserveForm3.controls['emailtext'].dirty || reserveForm3.controls['emailtext'].touched)"
+                                                class="text-danger" style="text-align:left">Email must be a valid email
+                                                address</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Date</label>
+                                            <input type="date" class="form-control" formControlName="datetext"
+                                                [ngClass]="{'is-invalid':submitted3 && reserveForm3.controls['datetext'].errors}">
+                                            <div *ngIf="submitted3 && reserveForm3.controls['datetext'].errors"
+                                                class="text-danger" style="text-align:left">Date is required
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Time</label>
+                                            <p>&nbsp;</p>
+                                            <div class="row" style="padding-left: 12px; width:40vh">
+                                                <div class="col-3" style="padding-right: 0px; padding-left: 0px">
+                                                    <select class="form-select" formControlName="hourtext"
+                                                        [ngClass]="{'is-invalid':submitted3 && reserveForm3.controls['hourtext'].errors}">
+                                                        <option style="display:none"></option>
+                                                        <option value="10">10</option>
+                                                        <option value="11">11</option>
+                                                        <option value="12">12</option>
+                                                        <option value="13">13</option>
+                                                        <option value="14">14</option>
+                                                        <option value="15">15</option>
+                                                        <option value="16">16</option>
+                                                        <option value="17">17</option>
+                                                    </select>
+                                                </div>
+                                                &nbsp;&nbsp;&nbsp;:&nbsp;
+                                                <div class="col-3" style="padding-right: 0px; padding-left: 0px">
+                                                    <select class="form-select" formControlName="mintext"
+                                                        [ngClass]="{'is-invalid':submitted3 && reserveForm3.controls['mintext'].errors}">
+                                                        <option style="display:none"></option>
+                                                        <option value="00">00</option>
+                                                        <option value="15">15</option>
+                                                        <option value="30">30</option>
+                                                        <option value="45">45</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-1" style="padding-right: 0px; padding-left: 6px">
+                                                    <fa-icon [icon]="faClock" style="padding-top: 1vh; display: block;">
+                                                    </fa-icon>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-danger"
+                                            (click)="changeButton3()">Submit</button>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button id="closeModalB3" type="button" class="btn btn-dark"
+                                        data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="d4" class="container-md text-center section4">
+                <br>
+                <div class="container-md">
+                    <button style="float: left; border: none; width: 24px; height: 24px; background-color: white;"
+                        type="button" (click)="exitDetail()">
+                        <a href="search#dataTableHead" style="color: black; text-decoration: none;">
+                            <mat-icon>keyboard_backspace</mat-icon>
+                        </a>
+                    </button>
+                </div>
+                <br><br>
+                <div class="first_info" *ngFor="let detail of detailCard4; let i = index;">
+                    <div class="text-center" id="d_name">{{detail.detailName}}</div>
+                </div>
+                <br>
+                <div class="tabDetail">
+                    <mat-tab-group mat-align-tabs="center" [(selectedIndex)]="tabIndex">
+                        <mat-tab label="Business detail">
+                            <br>
+                            <div class="d_info row" style="width: 100%;">
+                                <div class="col" style="padding: 0;">
+                                    <div [innerHtml]="d_41html"></div>
+                                    <div [innerHtml]="d_42html"></div>
+                                    <div [innerHtml]="d_43html"></div>
+                                </div>
+                                <div class="col">
+                                    <div [innerHtml]="d_44html"></div>
+                                    <div [innerHtml]="d_45html"></div>
+                                    <div [innerHtml]="d_46html"></div>
+                                </div>
+                            </div>
+                            <div *ngFor="let detail of detailCard4;">
+                                <button #modalButton4 class="btn" type="button" (click)="openBook4(detail.detailName)"
+                                    [ngClass]="action4 =='Reserve Now' ? 'btn-danger reserveB': 'btn-primary'">{{action4}}</button>
+                            </div>
+                            <br><br>
+                            <div class="shareIcon" *ngFor="let detail of detailfb4;">
+                                Share on:&nbsp;&nbsp;&nbsp;
+                                <a target="_blank"
+                                    href="https://twitter.com/intent/tweet?text=Check {{detail.twitterName}} on Yelp.&url={{detail.detailName}}">
+                                    <fa-icon [icon]="faTwitter"
+                                        style="display: inline-block; color: #3490ff; font-size: 28px;"></fa-icon>
+                                </a>
+                                &nbsp;&nbsp;
+                                <div class="fb-share-button" data-href="https://developers.facebook.com/docs/plugins/"
+                                    data-layout="button" data-size="small" style="display: inline;">
+                                    <a target="_blank"
+                                        href="https://www.facebook.com/sharer/sharer.php?u={{detail.detailName}}"
+                                        class="fb-xfbml-parse-ignore">
+                                        <fa-icon [icon]="faFacebookSquare"
+                                            style="display: inline-block; color: #0700ff; font-size: 28px;">
+                                        </fa-icon>
+                                    </a>
+                                </div>
+                            </div>
+                            <br>
+                            <div id="carouselExampleControls4" class="carousel slide" *ngFor="let pic of detailPic4;">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item active">
+                                        <img src="{{pic.pic1}}" class="d-block w-100" alt="">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="{{pic.pic2}}" class="d-block w-100" alt="">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="{{pic.pic3}}" class="d-block w-100" alt="">
+                                    </div>
+                                </div>
+                                <button class="carousel-control-prev" type="button"
+                                    data-bs-target="#carouselExampleControls4" data-bs-slide="prev"
+                                    (click)="startAuto('carouselExampleControls4')">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button"
+                                    data-bs-target="#carouselExampleControls4" data-bs-slide="next"
+                                    (click)="startAuto('carouselExampleControls4')">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Map location">
+                            <div class="my-google-map">
+                                <google-map [width]="null" [height]="null" [center]="{lat: maplat4, lng: maplng4}"
+                                    [options]="mapOptions">
+                                    <map-marker [position]="{lat: maplat4, lng: maplng4}"></map-marker>
+                                </google-map>
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Reviews">
+                            <table class="table table-striped">
+                                <tbody id="reviewTable" style="text-align: left;">
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName[4]}}</strong><br>
+                                            Rating: {{reviewRate[4]}}/5<br><br>
+                                            {{reviewText[4]}}<br><br>
+                                            {{reviewTime[4]}}<br><br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName1[4]}}</strong><br>
+                                            Rating: {{reviewRate1[4]}}/5<br><br>
+                                            {{reviewText1[4]}}<br><br>
+                                            {{reviewTime1[4]}}<br><br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName2[4]}}</strong><br>
+                                            Rating: {{reviewRate2[4]}}/5<br><br>
+                                            {{reviewText2[4]}}<br><br>
+                                            {{reviewTime2[4]}}<br><br>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </mat-tab>
+                    </mat-tab-group>
+                    <div class="modal" id="exampleModal4" #exampleModal4 *ngFor="let detail of detailCard4;"
+                        tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2 class="modal-title" id="exampleModalLabel4">Reservation form</h2>
+                                </div>
+                                <div class="modal-body">
+                                    <p style="font-size: 18px">{{detail.detailName}}</p>
+                                    <form [formGroup]="reserveForm4" (ngSubmit)="toBooking4(detail.detailName)">
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Email</label>
+                                            <input type="email" class="form-control" formControlName="emailtext"
+                                                [ngClass]="{'is-invalid':submitted4 && reserveForm4.controls['emailtext'].errors}">
+                                            <div *ngIf="submitted4 && reserveForm4.controls['emailtext'].errors && !reserveForm4.controls['emailtext'].dirty"
+                                                class="text-danger" style="text-align:left">Email is
+                                                required</div>
+                                            <div *ngIf="submitted4 && reserveForm4.controls['emailtext'].errors && (reserveForm4.controls['emailtext'].dirty || reserveForm4.controls['emailtext'].touched)"
+                                                class="text-danger" style="text-align:left">Email must be a valid email
+                                                address</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Date</label>
+                                            <input type="date" class="form-control" formControlName="datetext"
+                                                [ngClass]="{'is-invalid':submitted4 && reserveForm4.controls['datetext'].errors}">
+                                            <div *ngIf="submitted4 && reserveForm4.controls['datetext'].errors"
+                                                class="text-danger" style="text-align:left">Date is required
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Time</label>
+                                            <p>&nbsp;</p>
+                                            <div class="row" style="padding-left: 12px; width:40vh">
+                                                <div class="col-3" style="padding-right: 0px; padding-left: 0px">
+                                                    <select class="form-select" formControlName="hourtext"
+                                                        [ngClass]="{'is-invalid':submitted4 && reserveForm4.controls['hourtext'].errors}">
+                                                        <option style="display:none"></option>
+                                                        <option value="10">10</option>
+                                                        <option value="11">11</option>
+                                                        <option value="12">12</option>
+                                                        <option value="13">13</option>
+                                                        <option value="14">14</option>
+                                                        <option value="15">15</option>
+                                                        <option value="16">16</option>
+                                                        <option value="17">17</option>
+                                                    </select>
+                                                </div>
+                                                &nbsp;&nbsp;&nbsp;:&nbsp;
+                                                <div class="col-3" style="padding-right: 0px; padding-left: 0px">
+                                                    <select class="form-select" formControlName="mintext"
+                                                        [ngClass]="{'is-invalid':submitted4 && reserveForm4.controls['mintext'].errors}">
+                                                        <option style="display:none"></option>
+                                                        <option value="00">00</option>
+                                                        <option value="15">15</option>
+                                                        <option value="30">30</option>
+                                                        <option value="45">45</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-1" style="padding-right: 0px; padding-left: 6px">
+                                                    <fa-icon [icon]="faClock" style="padding-top: 1vh; display: block;">
+                                                    </fa-icon>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-danger"
+                                            (click)="changeButton4()">Submit</button>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button id="closeModalB4" type="button" class="btn btn-dark"
+                                        data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="d5" class="container-md text-center section4">
+                <br>
+                <div class="container-md">
+                    <button style="float: left; border: none; width: 24px; height: 24px; background-color: white;"
+                        type="button" (click)="exitDetail()">
+                        <a href="search#dataTableHead" style="color: black; text-decoration: none;">
+                            <mat-icon>keyboard_backspace</mat-icon>
+                        </a>
+                    </button>
+                </div>
+                <br><br>
+                <div class="first_info" *ngFor="let detail of detailCard5; let i = index;">
+                    <div class="text-center" id="d_name">{{detail.detailName}}</div>
+                </div>
+                <br>
+                <div class="tabDetail">
+                    <mat-tab-group mat-align-tabs="center" [(selectedIndex)]="tabIndex">
+                        <mat-tab label="Business detail">
+                            <br>
+                            <div class="d_info row" style="width: 100%;">
+                                <div class="col" style="padding: 0;">
+                                    <div [innerHtml]="d_51html"></div>
+                                    <div [innerHtml]="d_52html"></div>
+                                    <div [innerHtml]="d_53html"></div>
+                                </div>
+                                <div class="col">
+                                    <div [innerHtml]="d_54html"></div>
+                                    <div [innerHtml]="d_55html"></div>
+                                    <div [innerHtml]="d_56html"></div>
+                                </div>
+                            </div>
+                            <div *ngFor="let detail of detailCard5;">
+                                <button #modalButton5 class="btn" type="button" (click)="openBook5(detail.detailName)"
+                                    [ngClass]="action5 =='Reserve Now' ? 'btn-danger reserveB': 'btn-primary'">{{action5}}</button>
+                            </div>
+                            <br><br>
+                            <div class="shareIcon" *ngFor="let detail of detailfb5;">
+                                Share on:&nbsp;&nbsp;&nbsp;
+                                <a target="_blank"
+                                    href="https://twitter.com/intent/tweet?text=Check {{detail.twitterName}} on Yelp.&url={{detail.detailName}}">
+                                    <fa-icon [icon]="faTwitter"
+                                        style="display: inline-block; color: #3490ff; font-size: 28px;"></fa-icon>
+                                </a>
+                                &nbsp;&nbsp;
+                                <div class="fb-share-button" data-href="https://developers.facebook.com/docs/plugins/"
+                                    data-layout="button" data-size="small" style="display: inline;">
+                                    <a target="_blank"
+                                        href="https://www.facebook.com/sharer/sharer.php?u={{detail.detailName}}"
+                                        class="fb-xfbml-parse-ignore">
+                                        <fa-icon [icon]="faFacebookSquare"
+                                            style="display: inline-block; color: #0700ff; font-size: 28px;">
+                                        </fa-icon>
+                                    </a>
+                                </div>
+                            </div>
+                            <br>
+                            <div id="carouselExampleControls5" class="carousel slide" *ngFor="let pic of detailPic5;">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item active">
+                                        <img src="{{pic.pic1}}" class="d-block w-100" alt="">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="{{pic.pic2}}" class="d-block w-100" alt="">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="{{pic.pic3}}" class="d-block w-100" alt="">
+                                    </div>
+                                </div>
+                                <button class="carousel-control-prev" type="button"
+                                    data-bs-target="#carouselExampleControls5" data-bs-slide="prev"
+                                    (click)="startAuto('carouselExampleControls5')">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button"
+                                    data-bs-target="#carouselExampleControls5" data-bs-slide="next"
+                                    (click)="startAuto('carouselExampleControls5')">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Map location">
+                            <div class="my-google-map">
+                                <google-map [width]="null" [height]="null" [center]="{lat: maplat5, lng: maplng5}"
+                                    [options]="mapOptions">
+                                    <map-marker [position]="{lat: maplat5, lng: maplng5}"></map-marker>
+                                </google-map>
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Reviews">
+                            <table class="table table-striped">
+                                <tbody id="reviewTable" style="text-align: left;">
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName[5]}}</strong><br>
+                                            Rating: {{reviewRate[5]}}/5<br><br>
+                                            {{reviewText[5]}}<br><br>
+                                            {{reviewTime[5]}}<br><br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName1[5]}}</strong><br>
+                                            Rating: {{reviewRate1[5]}}/5<br><br>
+                                            {{reviewText1[5]}}<br><br>
+                                            {{reviewTime1[5]}}<br><br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName2[5]}}</strong><br>
+                                            Rating: {{reviewRate2[5]}}/5<br><br>
+                                            {{reviewText2[5]}}<br><br>
+                                            {{reviewTime2[5]}}<br><br>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </mat-tab>
+                    </mat-tab-group>
+                    <div class="modal" id="exampleModal5" #exampleModal5 *ngFor="let detail of detailCard5;"
+                        tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2 class="modal-title" id="exampleModalLabel5">Reservation form</h2>
+                                </div>
+                                <div class="modal-body">
+                                    <p style="font-size: 18px">{{detail.detailName}}</p>
+                                    <form [formGroup]="reserveForm5" (ngSubmit)="toBooking5(detail.detailName)">
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Email</label>
+                                            <input type="email" class="form-control" formControlName="emailtext"
+                                                [ngClass]="{'is-invalid':submitted5 && reserveForm5.controls['emailtext'].errors}">
+                                            <div *ngIf="submitted5 && reserveForm5.controls['emailtext'].errors && !reserveForm5.controls['emailtext'].dirty"
+                                                class="text-danger" style="text-align:left">Email is
+                                                required</div>
+                                            <div *ngIf="submitted5 && reserveForm5.controls['emailtext'].errors && (reserveForm5.controls['emailtext'].dirty || reserveForm5.controls['emailtext'].touched)"
+                                                class="text-danger" style="text-align:left">Email must be a valid email
+                                                address</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Date</label>
+                                            <input type="date" class="form-control" formControlName="datetext"
+                                                [ngClass]="{'is-invalid':submitted5 && reserveForm5.controls['datetext'].errors}">
+                                            <div *ngIf="submitted5 && reserveForm5.controls['datetext'].errors"
+                                                class="text-danger" style="text-align:left">Date is required
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Time</label>
+                                            <p>&nbsp;</p>
+                                            <div class="row" style="padding-left: 12px; width:40vh">
+                                                <div class="col-3" style="padding-right: 0px; padding-left: 0px">
+                                                    <select class="form-select" formControlName="hourtext"
+                                                        [ngClass]="{'is-invalid':submitted5 && reserveForm5.controls['hourtext'].errors}">
+                                                        <option style="display:none"></option>
+                                                        <option value="10">10</option>
+                                                        <option value="11">11</option>
+                                                        <option value="12">12</option>
+                                                        <option value="13">13</option>
+                                                        <option value="14">14</option>
+                                                        <option value="15">15</option>
+                                                        <option value="16">16</option>
+                                                        <option value="17">17</option>
+                                                    </select>
+                                                </div>
+                                                &nbsp;&nbsp;&nbsp;:&nbsp;
+                                                <div class="col-3" style="padding-right: 0px; padding-left: 0px">
+                                                    <select class="form-select" formControlName="mintext"
+                                                        [ngClass]="{'is-invalid':submitted5 && reserveForm5.controls['mintext'].errors}">
+                                                        <option style="display:none"></option>
+                                                        <option value="00">00</option>
+                                                        <option value="15">15</option>
+                                                        <option value="30">30</option>
+                                                        <option value="45">45</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-1" style="padding-right: 0px; padding-left: 6px">
+                                                    <fa-icon [icon]="faClock" style="padding-top: 1vh; display: block;">
+                                                    </fa-icon>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-danger"
+                                            (click)="changeButton5()">Submit</button>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button id="closeModalB5" type="button" class="btn btn-dark"
+                                        data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="d6" class="container-md text-center section4">
+                <br>
+                <div class="container-md">
+                    <button style="float: left; border: none; width: 24px; height: 24px; background-color: white;"
+                        type="button" (click)="exitDetail()">
+                        <a href="search#dataTableHead" style="color: black; text-decoration: none;">
+                            <mat-icon>keyboard_backspace</mat-icon>
+                        </a>
+                    </button>
+                </div>
+                <br><br>
+                <div class="first_info" *ngFor="let detail of detailCard6; let i = index;">
+                    <div class="text-center" id="d_name">{{detail.detailName}}</div>
+                </div>
+                <br>
+                <div class="tabDetail">
+                    <mat-tab-group mat-align-tabs="center" [(selectedIndex)]="tabIndex">
+                        <mat-tab label="Business detail">
+                            <br>
+                            <div class="d_info row" style="width: 100%;">
+                                <div class="col" style="padding: 0;">
+                                    <div [innerHtml]="d_61html"></div>
+                                    <div [innerHtml]="d_62html"></div>
+                                    <div [innerHtml]="d_63html"></div>
+                                </div>
+                                <div class="col">
+                                    <div [innerHtml]="d_64html"></div>
+                                    <div [innerHtml]="d_65html"></div>
+                                    <div [innerHtml]="d_66html"></div>
+                                </div>
+                            </div>
+                            <div *ngFor="let detail of detailCard6;">
+                                <button #modalButton6 class="btn" type="button" (click)="openBook6(detail.detailName)"
+                                    [ngClass]="action6 =='Reserve Now' ? 'btn-danger reserveB': 'btn-primary'">{{action6}}</button>
+                            </div>
+                            <br><br>
+                            <div class="shareIcon" *ngFor="let detail of detailfb6;">
+                                Share on:&nbsp;&nbsp;&nbsp;
+                                <a target="_blank"
+                                    href="https://twitter.com/intent/tweet?text=Check {{detail.twitterName}} on Yelp.&url={{detail.detailName}}">
+                                    <fa-icon [icon]="faTwitter"
+                                        style="display: inline-block; color: #3490ff; font-size: 28px;"></fa-icon>
+                                </a>
+                                &nbsp;&nbsp;
+                                <div class="fb-share-button" data-href="https://developers.facebook.com/docs/plugins/"
+                                    data-layout="button" data-size="small" style="display: inline;">
+                                    <a target="_blank"
+                                        href="https://www.facebook.com/sharer/sharer.php?u={{detail.detailName}}"
+                                        class="fb-xfbml-parse-ignore">
+                                        <fa-icon [icon]="faFacebookSquare"
+                                            style="display: inline-block; color: #0700ff; font-size: 28px;">
+                                        </fa-icon>
+                                    </a>
+                                </div>
+                            </div>
+                            <br>
+                            <div id="carouselExampleControls6" class="carousel slide" *ngFor="let pic of detailPic6;">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item active">
+                                        <img src="{{pic.pic1}}" class="d-block w-100" alt="">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="{{pic.pic2}}" class="d-block w-100" alt="">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="{{pic.pic3}}" class="d-block w-100" alt="">
+                                    </div>
+                                </div>
+                                <button class="carousel-control-prev" type="button"
+                                    data-bs-target="#carouselExampleControls6" data-bs-slide="prev"
+                                    (click)="startAuto('carouselExampleControls6')">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button"
+                                    data-bs-target="#carouselExampleControls6" data-bs-slide="next"
+                                    (click)="startAuto('carouselExampleControls6')">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Map location">
+                            <div class="my-google-map">
+                                <google-map [width]="null" [height]="null" [center]="{lat: maplat6, lng: maplng6}"
+                                    [options]="mapOptions">
+                                    <map-marker [position]="{lat: maplat6, lng: maplng6}"></map-marker>
+                                </google-map>
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Reviews">
+                            <table class="table table-striped">
+                                <tbody id="reviewTable" style="text-align: left;">
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName[6]}}</strong><br>
+                                            Rating: {{reviewRate[6]}}/5<br><br>
+                                            {{reviewText[6]}}<br><br>
+                                            {{reviewTime[6]}}<br><br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName1[6]}}</strong><br>
+                                            Rating: {{reviewRate1[6]}}/5<br><br>
+                                            {{reviewText1[6]}}<br><br>
+                                            {{reviewTime1[6]}}<br><br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName2[6]}}</strong><br>
+                                            Rating: {{reviewRate2[6]}}/5<br><br>
+                                            {{reviewText2[6]}}<br><br>
+                                            {{reviewTime2[6]}}<br><br>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </mat-tab>
+                    </mat-tab-group>
+                    <div class="modal" id="exampleModal6" #exampleModal6 *ngFor="let detail of detailCard6;"
+                        tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2 class="modal-title" id="exampleModalLabel6">Reservation form</h2>
+                                </div>
+                                <div class="modal-body">
+                                    <p style="font-size: 18px">{{detail.detailName}}</p>
+                                    <form [formGroup]="reserveForm6" (ngSubmit)="toBooking6(detail.detailName)">
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Email</label>
+                                            <input type="email" class="form-control" formControlName="emailtext"
+                                                [ngClass]="{'is-invalid':submitted6 && reserveForm6.controls['emailtext'].errors}">
+                                            <div *ngIf="submitted6 && reserveForm6.controls['emailtext'].errors && !reserveForm6.controls['emailtext'].dirty"
+                                                class="text-danger" style="text-align:left">Email is
+                                                required</div>
+                                            <div *ngIf="submitted6 && reserveForm6.controls['emailtext'].errors && (reserveForm6.controls['emailtext'].dirty || reserveForm6.controls['emailtext'].touched)"
+                                                class="text-danger" style="text-align:left">Email must be a valid email
+                                                address</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Date</label>
+                                            <input type="date" class="form-control" formControlName="datetext"
+                                                [ngClass]="{'is-invalid':submitted6 && reserveForm6.controls['datetext'].errors}">
+                                            <div *ngIf="submitted6 && reserveForm6.controls['datetext'].errors"
+                                                class="text-danger" style="text-align:left">Date is required
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Time</label>
+                                            <p>&nbsp;</p>
+                                            <div class="row" style="padding-left: 12px; width:40vh">
+                                                <div class="col-3" style="padding-right: 0px; padding-left: 0px">
+                                                    <select class="form-select" formControlName="hourtext"
+                                                        [ngClass]="{'is-invalid':submitted6 && reserveForm6.controls['hourtext'].errors}">
+                                                        <option style="display:none"></option>
+                                                        <option value="10">10</option>
+                                                        <option value="11">11</option>
+                                                        <option value="12">12</option>
+                                                        <option value="13">13</option>
+                                                        <option value="14">14</option>
+                                                        <option value="15">15</option>
+                                                        <option value="16">16</option>
+                                                        <option value="17">17</option>
+                                                    </select>
+                                                </div>
+                                                &nbsp;&nbsp;&nbsp;:&nbsp;
+                                                <div class="col-3" style="padding-right: 0px; padding-left: 0px">
+                                                    <select class="form-select" formControlName="mintext"
+                                                        [ngClass]="{'is-invalid':submitted6 && reserveForm6.controls['mintext'].errors}">
+                                                        <option style="display:none"></option>
+                                                        <option value="00">00</option>
+                                                        <option value="15">15</option>
+                                                        <option value="30">30</option>
+                                                        <option value="45">45</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-1" style="padding-right: 0px; padding-left: 6px">
+                                                    <fa-icon [icon]="faClock" style="padding-top: 1vh; display: block;">
+                                                    </fa-icon>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-danger"
+                                            (click)="changeButton6()">Submit</button>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button id="closeModalB6" type="button" class="btn btn-dark"
+                                        data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="d7" class="container-md text-center section4">
+                <br>
+                <div class="container-md">
+                    <button style="float: left; border: none; width: 24px; height: 24px; background-color: white;"
+                        type="button" (click)="exitDetail()">
+                        <a href="search#dataTableHead" style="color: black; text-decoration: none;">
+                            <mat-icon>keyboard_backspace</mat-icon>
+                        </a>
+                    </button>
+                </div>
+                <br><br>
+                <div class="first_info" *ngFor="let detail of detailCard7; let i = index;">
+                    <div class="text-center" id="d_name">{{detail.detailName}}</div>
+                </div>
+                <br>
+                <div class="tabDetail">
+                    <mat-tab-group mat-align-tabs="center" [(selectedIndex)]="tabIndex">
+                        <mat-tab label="Business detail">
+                            <br>
+                            <div class="d_info row" style="width: 100%;">
+                                <div class="col" style="padding: 0;">
+                                    <div [innerHtml]="d_71html"></div>
+                                    <div [innerHtml]="d_72html"></div>
+                                    <div [innerHtml]="d_73html"></div>
+                                </div>
+                                <div class="col">
+                                    <div [innerHtml]="d_74html"></div>
+                                    <div [innerHtml]="d_75html"></div>
+                                    <div [innerHtml]="d_76html"></div>
+                                </div>
+                            </div>
+                            <div *ngFor="let detail of detailCard7;">
+                                <button #modalButton7 class="btn" type="button" (click)="openBook7(detail.detailName)"
+                                    [ngClass]="action7 =='Reserve Now' ? 'btn-danger reserveB': 'btn-primary'">{{action7}}</button>
+                            </div>
+                            <br><br>
+                            <div class="shareIcon" *ngFor="let detail of detailfb7;">
+                                Share on:&nbsp;&nbsp;&nbsp;
+                                <a target="_blank"
+                                    href="https://twitter.com/intent/tweet?text=Check {{detail.twitterName}} on Yelp.&url={{detail.detailName}}">
+                                    <fa-icon [icon]="faTwitter"
+                                        style="display: inline-block; color: #3490ff; font-size: 28px;"></fa-icon>
+                                </a>
+                                &nbsp;&nbsp;
+                                <div class="fb-share-button" data-href="https://developers.facebook.com/docs/plugins/"
+                                    data-layout="button" data-size="small" style="display: inline;">
+                                    <a target="_blank"
+                                        href="https://www.facebook.com/sharer/sharer.php?u={{detail.detailName}}"
+                                        class="fb-xfbml-parse-ignore">
+                                        <fa-icon [icon]="faFacebookSquare"
+                                            style="display: inline-block; color: #0700ff; font-size: 28px;">
+                                        </fa-icon>
+                                    </a>
+                                </div>
+                            </div>
+                            <br>
+                            <div id="carouselExampleControls7" class="carousel slide" *ngFor="let pic of detailPic7;">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item active">
+                                        <img src="{{pic.pic1}}" class="d-block w-100" alt="">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="{{pic.pic2}}" class="d-block w-100" alt="">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="{{pic.pic3}}" class="d-block w-100" alt="">
+                                    </div>
+                                </div>
+                                <button class="carousel-control-prev" type="button"
+                                    data-bs-target="#carouselExampleControls7" data-bs-slide="prev"
+                                    (click)="startAuto('carouselExampleControls7')">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button"
+                                    data-bs-target="#carouselExampleControls7" data-bs-slide="next"
+                                    (click)="startAuto('carouselExampleControls7')">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Map location">
+                            <div class="my-google-map">
+                                <google-map [width]="null" [height]="null" [center]="{lat: maplat7, lng: maplng7}"
+                                    [options]="mapOptions">
+                                    <map-marker [position]="{lat: maplat7, lng: maplng7}"></map-marker>
+                                </google-map>
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Reviews">
+                            <table class="table table-striped">
+                                <tbody id="reviewTable" style="text-align: left;">
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName[7]}}</strong><br>
+                                            Rating: {{reviewRate[7]}}/5<br><br>
+                                            {{reviewText[7]}}<br><br>
+                                            {{reviewTime[7]}}<br><br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName1[7]}}</strong><br>
+                                            Rating: {{reviewRate1[7]}}/5<br><br>
+                                            {{reviewText1[7]}}<br><br>
+                                            {{reviewTime1[7]}}<br><br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName2[7]}}</strong><br>
+                                            Rating: {{reviewRate2[7]}}/5<br><br>
+                                            {{reviewText2[7]}}<br><br>
+                                            {{reviewTime2[7]}}<br><br>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </mat-tab>
+                    </mat-tab-group>
+                    <div class="modal" id="exampleModal7" #exampleModal7 *ngFor="let detail of detailCard7;"
+                        tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2 class="modal-title" id="exampleModalLabel7">Reservation form</h2>
+                                </div>
+                                <div class="modal-body">
+                                    <p style="font-size: 18px">{{detail.detailName}}</p>
+                                    <form [formGroup]="reserveForm7" (ngSubmit)="toBooking7(detail.detailName)">
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Email</label>
+                                            <input type="email" class="form-control" formControlName="emailtext"
+                                                [ngClass]="{'is-invalid':submitted7 && reserveForm7.controls['emailtext'].errors}">
+                                            <div *ngIf="submitted7 && reserveForm7.controls['emailtext'].errors && !reserveForm7.controls['emailtext'].dirty"
+                                                class="text-danger" style="text-align:left">Email is
+                                                required</div>
+                                            <div *ngIf="submitted7 && reserveForm7.controls['emailtext'].errors && (reserveForm7.controls['emailtext'].dirty || reserveForm7.controls['emailtext'].touched)"
+                                                class="text-danger" style="text-align:left">Email must be a valid email
+                                                address</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Date</label>
+                                            <input type="date" class="form-control" formControlName="datetext"
+                                                [ngClass]="{'is-invalid':submitted7 && reserveForm7.controls['datetext'].errors}">
+                                            <div *ngIf="submitted7 && reserveForm7.controls['datetext'].errors"
+                                                class="text-danger" style="text-align:left">Date is required
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Time</label>
+                                            <p>&nbsp;</p>
+                                            <div class="row" style="padding-left: 12px; width:40vh">
+                                                <div class="col-3" style="padding-right: 0px; padding-left: 0px">
+                                                    <select class="form-select" formControlName="hourtext"
+                                                        [ngClass]="{'is-invalid':submitted7 && reserveForm7.controls['hourtext'].errors}">
+                                                        <option style="display:none"></option>
+                                                        <option value="10">10</option>
+                                                        <option value="11">11</option>
+                                                        <option value="12">12</option>
+                                                        <option value="13">13</option>
+                                                        <option value="14">14</option>
+                                                        <option value="15">15</option>
+                                                        <option value="16">16</option>
+                                                        <option value="17">17</option>
+                                                    </select>
+                                                </div>
+                                                &nbsp;&nbsp;&nbsp;:&nbsp;
+                                                <div class="col-3" style="padding-right: 0px; padding-left: 0px">
+                                                    <select class="form-select" formControlName="mintext"
+                                                        [ngClass]="{'is-invalid':submitted7 && reserveForm7.controls['mintext'].errors}">
+                                                        <option style="display:none"></option>
+                                                        <option value="00">00</option>
+                                                        <option value="15">15</option>
+                                                        <option value="30">30</option>
+                                                        <option value="45">45</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-1" style="padding-right: 0px; padding-left: 6px">
+                                                    <fa-icon [icon]="faClock" style="padding-top: 1vh; display: block;">
+                                                    </fa-icon>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-danger"
+                                            (click)="changeButton7()">Submit</button>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button id="closeModalB7" type="button" class="btn btn-dark"
+                                        data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="d8" class="container-md text-center section4">
+                <br>
+                <div class="container-md">
+                    <button style="float: left; border: none; width: 24px; height: 24px; background-color: white;"
+                        type="button" (click)="exitDetail()">
+                        <a href="search#dataTableHead" style="color: black; text-decoration: none;">
+                            <mat-icon>keyboard_backspace</mat-icon>
+                        </a>
+                    </button>
+                </div>
+                <br><br>
+                <div class="first_info" *ngFor="let detail of detailCard8; let i = index;">
+                    <div class="text-center" id="d_name">{{detail.detailName}}</div>
+                </div>
+                <br>
+                <div class="tabDetail">
+                    <mat-tab-group mat-align-tabs="center" [(selectedIndex)]="tabIndex">
+                        <mat-tab label="Business detail">
+                            <br>
+                            <div class="d_info row" style="width: 100%;">
+                                <div class="col" style="padding: 0;">
+                                    <div [innerHtml]="d_81html"></div>
+                                    <div [innerHtml]="d_82html"></div>
+                                    <div [innerHtml]="d_83html"></div>
+                                </div>
+                                <div class="col">
+                                    <div [innerHtml]="d_84html"></div>
+                                    <div [innerHtml]="d_85html"></div>
+                                    <div [innerHtml]="d_86html"></div>
+                                </div>
+                            </div>
+                            <div *ngFor="let detail of detailCard8;">
+                                <button #modalButton8 class="btn" type="button" (click)="openBook8(detail.detailName)"
+                                    [ngClass]="action8 =='Reserve Now' ? 'btn-danger reserveB': 'btn-primary'">{{action8}}</button>
+                            </div>
+                            <br><br>
+                            <div class="shareIcon" *ngFor="let detail of detailfb8;">
+                                Share on:&nbsp;&nbsp;&nbsp;
+                                <a target="_blank"
+                                    href="https://twitter.com/intent/tweet?text=Check {{detail.twitterName}} on Yelp.&url={{detail.detailName}}">
+                                    <fa-icon [icon]="faTwitter"
+                                        style="display: inline-block; color: #3490ff; font-size: 28px;"></fa-icon>
+                                </a>
+                                &nbsp;&nbsp;
+                                <div class="fb-share-button" data-href="https://developers.facebook.com/docs/plugins/"
+                                    data-layout="button" data-size="small" style="display: inline;">
+                                    <a target="_blank"
+                                        href="https://www.facebook.com/sharer/sharer.php?u={{detail.detailName}}"
+                                        class="fb-xfbml-parse-ignore">
+                                        <fa-icon [icon]="faFacebookSquare"
+                                            style="display: inline-block; color: #0700ff; font-size: 28px;">
+                                        </fa-icon>
+                                    </a>
+                                </div>
+                            </div>
+                            <br>
+                            <div id="carouselExampleControls8" class="carousel slide" *ngFor="let pic of detailPic8;">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item active">
+                                        <img src="{{pic.pic1}}" class="d-block w-100" alt="">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="{{pic.pic2}}" class="d-block w-100" alt="">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="{{pic.pic3}}" class="d-block w-100" alt="">
+                                    </div>
+                                </div>
+                                <button class="carousel-control-prev" type="button"
+                                    data-bs-target="#carouselExampleControls8" data-bs-slide="prev"
+                                    (click)="startAuto('carouselExampleControls8')">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button"
+                                    data-bs-target="#carouselExampleControls8" data-bs-slide="next"
+                                    (click)="startAuto('carouselExampleControls8')">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Map location">
+                            <div class="my-google-map">
+                                <google-map [width]="null" [height]="null" [center]="{lat: maplat8, lng: maplng8}"
+                                    [options]="mapOptions">
+                                    <map-marker [position]="{lat: maplat8, lng: maplng8}"></map-marker>
+                                </google-map>
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Reviews">
+                            <table class="table table-striped">
+                                <tbody id="reviewTable" style="text-align: left;">
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName[8]}}</strong><br>
+                                            Rating: {{reviewRate[8]}}/5<br><br>
+                                            {{reviewText[8]}}<br><br>
+                                            {{reviewTime[8]}}<br><br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName1[8]}}</strong><br>
+                                            Rating: {{reviewRate1[8]}}/5<br><br>
+                                            {{reviewText1[8]}}<br><br>
+                                            {{reviewTime1[8]}}<br><br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName2[8]}}</strong><br>
+                                            Rating: {{reviewRate2[8]}}/5<br><br>
+                                            {{reviewText2[8]}}<br><br>
+                                            {{reviewTime2[8]}}<br><br>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </mat-tab>
+                    </mat-tab-group>
+                    <div class="modal" id="exampleModal8" #exampleModal8 *ngFor="let detail of detailCard8;"
+                        tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2 class="modal-title" id="exampleModalLabel8">Reservation form</h2>
+                                </div>
+                                <div class="modal-body">
+                                    <p style="font-size: 18px">{{detail.detailName}}</p>
+                                    <form [formGroup]="reserveForm8" (ngSubmit)="toBooking8(detail.detailName)">
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Email</label>
+                                            <input type="email" class="form-control" formControlName="emailtext"
+                                                [ngClass]="{'is-invalid':submitted8 && reserveForm8.controls['emailtext'].errors}">
+                                            <div *ngIf="submitted8 && reserveForm8.controls['emailtext'].errors && !reserveForm8.controls['emailtext'].dirty"
+                                                class="text-danger" style="text-align:left">Email is
+                                                required</div>
+                                            <div *ngIf="submitted8 && reserveForm8.controls['emailtext'].errors && (reserveForm8.controls['emailtext'].dirty || reserveForm8.controls['emailtext'].touched)"
+                                                class="text-danger" style="text-align:left">Email must be a valid email
+                                                address</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Date</label>
+                                            <input type="date" class="form-control" formControlName="datetext"
+                                                [ngClass]="{'is-invalid':submitted8 && reserveForm8.controls['datetext'].errors}">
+                                            <div *ngIf="submitted8 && reserveForm8.controls['datetext'].errors"
+                                                class="text-danger" style="text-align:left">Date is required
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Time</label>
+                                            <p>&nbsp;</p>
+                                            <div class="row" style="padding-left: 12px; width:40vh">
+                                                <div class="col-3" style="padding-right: 0px; padding-left: 0px">
+                                                    <select class="form-select" formControlName="hourtext"
+                                                        [ngClass]="{'is-invalid':submitted8 && reserveForm8.controls['hourtext'].errors}">
+                                                        <option style="display:none"></option>
+                                                        <option value="10">10</option>
+                                                        <option value="11">11</option>
+                                                        <option value="12">12</option>
+                                                        <option value="13">13</option>
+                                                        <option value="14">14</option>
+                                                        <option value="15">15</option>
+                                                        <option value="16">16</option>
+                                                        <option value="17">17</option>
+                                                    </select>
+                                                </div>
+                                                &nbsp;&nbsp;&nbsp;:&nbsp;
+                                                <div class="col-3" style="padding-right: 0px; padding-left: 0px">
+                                                    <select class="form-select" formControlName="mintext"
+                                                        [ngClass]="{'is-invalid':submitted8 && reserveForm8.controls['mintext'].errors}">
+                                                        <option style="display:none"></option>
+                                                        <option value="00">00</option>
+                                                        <option value="15">15</option>
+                                                        <option value="30">30</option>
+                                                        <option value="45">45</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-1" style="padding-right: 0px; padding-left: 6px">
+                                                    <fa-icon [icon]="faClock" style="padding-top: 1vh; display: block;">
+                                                    </fa-icon>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-danger"
+                                            (click)="changeButton8()">Submit</button>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button id="closeModalB8" type="button" class="btn btn-dark"
+                                        data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="d9" class="container-md text-center section4">
+                <br>
+                <div class="container-md">
+                    <button style="float: left; border: none; width: 24px; height: 24px; background-color: white;"
+                        type="button" (click)="exitDetail()">
+                        <a href="search#dataTableHead" style="color: black; text-decoration: none;">
+                            <mat-icon>keyboard_backspace</mat-icon>
+                        </a>
+                    </button>
+                </div>
+                <br><br>
+                <div class="first_info" *ngFor="let detail of detailCard9; let i = index;">
+                    <div class="text-center" id="d_name">{{detail.detailName}}</div>
+                </div>
+                <br>
+                <div class="tabDetail">
+                    <mat-tab-group mat-align-tabs="center" [(selectedIndex)]="tabIndex">
+                        <mat-tab label="Business detail">
+                            <br>
+                            <div class="d_info row" style="width: 100%;">
+                                <div class="col" style="padding: 0;">
+                                    <div [innerHtml]="d_91html"></div>
+                                    <div [innerHtml]="d_92html"></div>
+                                    <div [innerHtml]="d_93html"></div>
+                                </div>
+                                <div class="col">
+                                    <div [innerHtml]="d_94html"></div>
+                                    <div [innerHtml]="d_95html"></div>
+                                    <div [innerHtml]="d_96html"></div>
+                                </div>
+                            </div>
+                            <div *ngFor="let detail of detailCard9;">
+                                <button #modalButton9 class="btn" type="button" (click)="openBook9(detail.detailName)"
+                                    [ngClass]="action9 =='Reserve Now' ? 'btn-danger reserveB': 'btn-primary'">{{action9}}</button>
+                            </div>
+                            <br><br>
+                            <div class="shareIcon" *ngFor="let detail of detailfb9;">
+                                Share on:&nbsp;&nbsp;&nbsp;
+                                <a target="_blank"
+                                    href="https://twitter.com/intent/tweet?text=Check {{detail.twitterName}} on Yelp.&url={{detail.detailName}}">
+                                    <fa-icon [icon]="faTwitter"
+                                        style="display: inline-block; color: #3490ff; font-size: 28px;"></fa-icon>
+                                </a>
+                                &nbsp;&nbsp;
+                                <div class="fb-share-button" data-href="https://developers.facebook.com/docs/plugins/"
+                                    data-layout="button" data-size="small" style="display: inline;">
+                                    <a target="_blank"
+                                        href="https://www.facebook.com/sharer/sharer.php?u={{detail.detailName}}"
+                                        class="fb-xfbml-parse-ignore">
+                                        <fa-icon [icon]="faFacebookSquare"
+                                            style="display: inline-block; color: #0700ff; font-size: 28px;">
+                                        </fa-icon>
+                                    </a>
+                                </div>
+                            </div>
+                            <br>
+                            <div id="carouselExampleControls9" class="carousel slide" *ngFor="let pic of detailPic9;">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item active">
+                                        <img src="{{pic.pic1}}" class="d-block w-100" alt="">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="{{pic.pic2}}" class="d-block w-100" alt="">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="{{pic.pic3}}" class="d-block w-100" alt="">
+                                    </div>
+                                </div>
+                                <button class="carousel-control-prev" type="button"
+                                    data-bs-target="#carouselExampleControls9" data-bs-slide="prev"
+                                    (click)="startAuto('carouselExampleControls9')">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button"
+                                    data-bs-target="#carouselExampleControls9" data-bs-slide="next"
+                                    (click)="startAuto('carouselExampleControls9')">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Map location">
+                            <div class="my-google-map">
+                                <google-map [width]="null" [height]="null" [center]="{lat: maplat9, lng: maplng9}"
+                                    [options]="mapOptions">
+                                    <map-marker [position]="{lat: maplat9, lng: maplng9}"></map-marker>
+                                </google-map>
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Reviews">
+                            <table class="table table-striped">
+                                <tbody id="reviewTable" style="text-align: left;">
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName[9]}}</strong><br>
+                                            Rating: {{reviewRate[9]}}/5<br><br>
+                                            {{reviewText[9]}}<br><br>
+                                            {{reviewTime[9]}}<br><br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName1[9]}}</strong><br>
+                                            Rating: {{reviewRate1[9]}}/5<br><br>
+                                            {{reviewText1[9]}}<br><br>
+                                            {{reviewTime1[9]}}<br><br>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col">
+                                            <strong>{{reviewName2[9]}}</strong><br>
+                                            Rating: {{reviewRate2[9]}}/5<br><br>
+                                            {{reviewText2[9]}}<br><br>
+                                            {{reviewTime2[9]}}<br><br>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </mat-tab>
+                    </mat-tab-group>
+                    <div class="modal" id="exampleModal9" #exampleModal9 *ngFor="let detail of detailCard9;"
+                        tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2 class="modal-title" id="exampleModalLabel9">Reservation form</h2>
+                                </div>
+                                <div class="modal-body">
+                                    <p style="font-size: 18px">{{detail.detailName}}</p>
+                                    <form [formGroup]="reserveForm9" (ngSubmit)="toBooking9(detail.detailName)">
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Email</label>
+                                            <input type="email" class="form-control" formControlName="emailtext"
+                                                [ngClass]="{'is-invalid':submitted9 && reserveForm9.controls['emailtext'].errors}">
+                                            <div *ngIf="submitted9 && reserveForm9.controls['emailtext'].errors && !reserveForm9.controls['emailtext'].dirty"
+                                                class="text-danger" style="text-align:left">Email is
+                                                required</div>
+                                            <div *ngIf="submitted9 && reserveForm9.controls['emailtext'].errors && (reserveForm9.controls['emailtext'].dirty || reserveForm9.controls['emailtext'].touched)"
+                                                class="text-danger" style="text-align:left">Email must be a valid email
+                                                address</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Date</label>
+                                            <input type="date" class="form-control" formControlName="datetext"
+                                                [ngClass]="{'is-invalid':submitted9 && reserveForm9.controls['datetext'].errors}">
+                                            <div *ngIf="submitted9 && reserveForm9.controls['datetext'].errors"
+                                                class="text-danger" style="text-align:left">Date is required
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label modalTitle">Time</label>
+                                            <p>&nbsp;</p>
+                                            <div class="row" style="padding-left: 12px; width:40vh">
+                                                <div class="col-3" style="padding-right: 0px; padding-left: 0px">
+                                                    <select class="form-select" formControlName="hourtext"
+                                                        [ngClass]="{'is-invalid':submitted9 && reserveForm9.controls['hourtext'].errors}">
+                                                        <option style="display:none"></option>
+                                                        <option value="10">10</option>
+                                                        <option value="11">11</option>
+                                                        <option value="12">12</option>
+                                                        <option value="13">13</option>
+                                                        <option value="14">14</option>
+                                                        <option value="15">15</option>
+                                                        <option value="16">16</option>
+                                                        <option value="17">17</option>
+                                                    </select>
+                                                </div>
+                                                &nbsp;&nbsp;&nbsp;:&nbsp;
+                                                <div class="col-3" style="padding-right: 0px; padding-left: 0px">
+                                                    <select class="form-select" formControlName="mintext"
+                                                        [ngClass]="{'is-invalid':submitted9 && reserveForm9.controls['mintext'].errors}">
+                                                        <option style="display:none"></option>
+                                                        <option value="00">00</option>
+                                                        <option value="15">15</option>
+                                                        <option value="30">30</option>
+                                                        <option value="45">45</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-1" style="padding-right: 0px; padding-left: 6px">
+                                                    <fa-icon [icon]="faClock" style="padding-top: 1vh; display: block;">
+                                                    </fa-icon>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-danger"
+                                            (click)="changeButton9()">Submit</button>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button id="closeModalB9" type="button" class="btn btn-dark"
+                                        data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="spaceS"></div>
+        <br>
+    </div>
+</div>
+

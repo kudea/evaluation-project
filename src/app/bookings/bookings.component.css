@@ -1,0 +1,35 @@
+.back3 {
+    background-image: url(/assets/images/city.jpg);
+    background-size: 2000px 90%;
+    width: 100%;
+    min-height: 100vh;
+    height: auto;
+    padding: 0;
+    background-position: center 100px;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    display: block;
+}
+
+.back4 .back5 {
+    display: block;
+    width: 100%;
+    min-height: 100vh;
+    height: auto;
+    padding: 0;
+    background-image: linear-gradient(to top, rgba(0, 0, 255, 0.2), rgba(0, 0, 255, 0.01));
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+table {
+    font-size: 15px;
+    overflow-x: auto;
+    display: block;
+}
+
+.hoverTable:hover {
+    background-color: #f0ecec;
+}

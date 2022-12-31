@@ -1,1 +1,39 @@
-<p>bookings works!</p>
+<div class="back3 back4">
+    <div class="back5">
+        <br>
+        <div class="container-md text-center" id="part1">
+            <div id="title">
+                <h1>List of your reservations</h1>
+            </div>
+            <br>
+            <div class="myTable" style="background-color: white; border-radius: 20px; margin-left: 0; margin-right: 0;">
+                <table class="table" style=" max-width: 100%; min-width: 370px; ">
+                    <thead class="text-center" id="reservedataTableHead">
+                        <tr>
+                            <th class="col-sm-1" id="num">#</th>
+                            <th class="col-sm-3" id="bName">Business Name</th>
+                            <th class="col-sm-2" id="date">Date</th>
+                            <th class="col-sm-2" id="time">Time</th>
+                            <th class="col-sm-4" id="email">Email</th>
+                            <th class="col-sm-2" style="padding-right: 5vh;">&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-center" id="reservedataTable" *ngFor="let book of bookings; let i = index">
+                        <tr class="hoverTable">
+                            <td>{{i+1}}</td>
+                            <td>{{book.businessname}}</td>
+                            <td>{{book.datetext}}</td>
+                            <td>{{book.hourtext}}:{{book.mintext}}</td>
+                            <td>{{book.emailtext}}</td>
+                            <td><fa-icon class="pointer" [icon]="faTrashCan"
+                                style="display: inline-block;" (click)="delete(book.businessname)"></fa-icon></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br>
+        <div id="part2">
+        </div>
+    </div>
+</div>

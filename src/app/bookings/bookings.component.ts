@@ -1,5 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
 import { AppServiceService } from '../app-service.service';
 import { booking } from '../booking';
 import { BOOKINGS } from '../bookingTable';
@@ -13,14 +12,17 @@ import { faTrashAlt, faTrashCan } from '@fortawesome/free-regular-svg-icons';
 export class BookingsComponent implements OnInit {
   bookings: booking[] = []
 
+  // icon
   faTrashAlt = faTrashAlt
   faTrashCan = faTrashCan
+
   constructor(private service: AppServiceService) { }
 
   ngOnInit(): void {
-    this.reserveTable()
+    this.bookingTable()
     this.tableControl()
   }
+
   localStoragedata: any = []
 
   delete(name: any) {
@@ -40,7 +42,9 @@ export class BookingsComponent implements OnInit {
     localStorage.removeItem(name)
     this.tableControl()
   }
-  reserveTable(): void {
+
+  // build booking table
+  bookingTable(): void {
     this.service.getBookings()
       .subscribe(bookings => {
         for (var i = 0, len = localStorage.length; i < len; i++) {
@@ -52,6 +56,7 @@ export class BookingsComponent implements OnInit {
       })
   }
 
+  // innerHTML
   part1: any
   part2: any
   title: any

@@ -12,22 +12,10 @@ export class AppServiceService {
 
   constructor(private http: HttpClient) { }
 
-  search(data : any) {
-    console.log('yelp get ', data)
-    return this.http.get(`https://backend-ozaisotptq-wl.a.run.app/search/?${data}`)
-    // return this.http.get(`/api/search/?${data}`)
-  }
-
   autoComplete(data : any) {
     console.log('autoComplete get ', data)
     return this.http.get(`https://backend-ozaisotptq-wl.a.run.app/search/autocomplete/?word=${data}`)
     // return this.http.get(`/api/search/autocomplete/?word=${data}`)
-  }
-
-  searchDetail(data : any) {
-    console.log('yelp get detail ', data)
-    return this.http.get(`https://backend-ozaisotptq-wl.a.run.app/search/businessesDetail/?id=${data}`)
-    // return this.http.get(`/api/search/businessesDetail/?id=${data}`)
   }
 
   searchReview(data : any) {

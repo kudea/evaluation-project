@@ -2,7 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { AppServiceService } from '../app-service.service';
 import { booking } from '../booking';
 import { BOOKINGS } from '../bookingTable';
-import { faTrashAlt, faTrashCan } from '@fortawesome/free-regular-svg-icons';
+import { faTrashAlt, faTrashCan, faEdit, faClock } from '@fortawesome/free-regular-svg-icons';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Modal } from 'bootstrap'
+
+declare var bootstrap: any;
+declare var window: any;
 
 @Component({
   selector: 'app-bookings',
@@ -15,12 +20,21 @@ export class BookingsComponent implements OnInit {
   // icon
   faTrashAlt = faTrashAlt
   faTrashCan = faTrashCan
+  faEdit = faEdit
+  faClock = faClock
 
-  constructor(private service: AppServiceService) { }
+  constructor(private service: AppServiceService, private formBuilder: FormBuilder) { }
 
   ngOnInit(): void {
     this.bookingTable()
     this.tableControl()
+    // reserve info validators
+    this.reserveForm = this.formBuilder.group({
+      emailtext: ['', [Validators.required, Validators.email]],
+      datetext: ['', Validators.required],
+      hourtext: ['', Validators.required],
+      mintext: ['', Validators.required]
+    })
   }
 
   localStoragedata: any = []
@@ -40,6 +54,52 @@ export class BookingsComponent implements OnInit {
       }
     }
     localStorage.removeItem(name)
+    this.tableControl()
+  }
+
+  // control reserve form
+  reserveForm !: FormGroup
+  submitted = false
+
+  toBooking(name: any) {
+    this.submitted = true
+    if (this.reserveForm.invalid) {
+      return
+    }
+    this.getBooking(this.reserveForm.value, name)
+  }
+
+  getBooking(data: any, name: string) {
+    BOOKINGS.push({ businessname: name, emailtext: data.emailtext, datetext: data.datetext, hourtext: data.hourtext, mintext: data.mintext })
+    localStorage.setItem(name, JSON.stringify({ businessname: name, emailtext: data.emailtext, datetext: data.datetext, hourtext: data.hourtext, mintext: data.mintext }))
+    console.log(localStorage)
+  }
+
+  action: any = 'Reserve Now'
+  closeButton: any
+
+  changeButton() {
+    if (this.reserveForm.invalid) {
+      return
+    }
+    if (this.action == 'Reserve Now') {
+      this.action = 'Cancel reservation'
+      alert('Reservation edited!')
+      this.closeButton = document.getElementById('closeModalB')
+      this.closeButton.click()
+    }
+    window.location.href = "/bookings"
+  }
+
+  // open reserve form
+  myModal: Modal | undefined
+
+  edit(name: string) {
+
+    this.myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {
+      keyboard: false
+    })
+    this.myModal?.show()
     this.tableControl()
   }
 

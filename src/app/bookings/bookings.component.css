@@ -33,3 +33,19 @@ table {
 .hoverTable:hover {
     background-color: #f0ecec;
 }
+
+.modal-title {
+    font-size: 22px;
+}
+
+.mat-typography h2 {
+    margin: 0;
+}
+
+.modalTitle {
+    float: left;
+}
+
+.form-select {
+    background-image: none
+}

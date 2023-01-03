@@ -3,16 +3,12 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { AppServiceService } from '../app-service.service';
 import { faTwitter, faFacebookSquare } from '@fortawesome/free-brands-svg-icons';
 import { faClock } from '@fortawesome/free-regular-svg-icons';
-import { NgbModal} from '@ng-bootstrap/ng-bootstrap'
 import { Modal } from 'bootstrap'
 import { booking } from '../booking';
 import { BOOKINGS } from '../bookingTable';
-import { ActivatedRoute } from '@angular/router';
 import axios from 'axios';
-declare let $: any;
 
 declare var bootstrap: any;
-declare var window: any;
 
 @Component({
   selector: 'app-search',
@@ -22,22 +18,18 @@ declare var window: any;
 })
 
 export class SearchComponent implements OnInit {
-  
+
+  // icon
   faTwitter = faTwitter
   faFacebookSquare = faFacebookSquare
   faClock = faClock
-  myControl = new FormControl('')
-  defaultCate = "all"
-  inputWord: any
-  options = ['']
 
+  // search result
   resultTable: any = []
+
   // detail section
   detailData: any = {
-    name: null,
-    address: null,
-    categories: null,
-    images: [],
+    name: null
   }
 
   // carousel image
@@ -55,16 +47,16 @@ export class SearchComponent implements OnInit {
 
   stopAuto() {
     this.myCarousel = document.getElementById('carouselExampleControls')
-    try{
+    try {
       this.carousel.pause()
-    }catch(e){
+    } catch (e) {
       return
     }
   }
 
   myKeyword: any
   businessesDetailID: any
-  detailCard = [{ detailName: ''}]
+  detailCard = [{ detailName: '' }]
   detailfb = [{ detailName: '', twitterName: '' }]
   detailPic = [{ pic1: '', pic2: '', pic3: '' }]
 
@@ -74,13 +66,12 @@ export class SearchComponent implements OnInit {
     zoom: 14
   };
 
-  bookings: booking | undefined
-
-  constructor(private service: AppServiceService, private formBuilder: FormBuilder, private modalService: NgbModal, private route: ActivatedRoute,) { }
+  constructor(private service: AppServiceService, private formBuilder: FormBuilder) { }
 
   ngOnInit(): void {
     this.findWord()
 
+    // reserve info validators
     this.reserveForm = this.formBuilder.group({
       emailtext: ['', [Validators.required, Validators.email]],
       datetext: ['', Validators.required],
@@ -90,6 +81,8 @@ export class SearchComponent implements OnInit {
 
   }
 
+  // control reserve form
+  bookings: booking | undefined
   reserveForm !: FormGroup
   submitted = false
 
@@ -123,14 +116,15 @@ export class SearchComponent implements OnInit {
 
   }
 
+  // open reserve form
   myModal: Modal | undefined
 
   openBook(name: string) {
     if (this.action == 'Cancel reservation') {
       this.action = 'Reserve Now'
       alert('Reservation cancelled!')
-      for( var i = 0; i < BOOKINGS.length; i++){ 
-        if ( BOOKINGS[i].businessname == name) { 
+      for (var i = 0; i < BOOKINGS.length; i++) {
+        if (BOOKINGS[i].businessname == name) {
           BOOKINGS.splice(i, 1)
           i--
         }
@@ -165,14 +159,19 @@ export class SearchComponent implements OnInit {
         this.getShow.style.display = "block"
       }
     }
-    
+
   }
+
+  // search form
   wantSpinner = false
 
+  // input form
+  myControl = new FormControl('')
+
+  // filter for autoConplete
   findWord() {
-   
-    this.myControl.valueChanges.subscribe((response: any)=> {
-      if(response.length > 1) {
+    this.myControl.valueChanges.subscribe((response: any) => {
+      if (response.length > 1) {
         this.wantSpinner = true
         this.getAutoComplete(response)
       } else {
@@ -185,9 +184,10 @@ export class SearchComponent implements OnInit {
     this.myKeyword = keyword
   }
 
+  options = ['']
   getAutoComplete(dataFromfindWord: any) {
     this.getKeyword(dataFromfindWord)
-    
+
     this.service.autoComplete(dataFromfindWord).subscribe((response: any) => {
       this.options.length = 0
       this.wantSpinner = false
@@ -220,6 +220,7 @@ export class SearchComponent implements OnInit {
 
   getReview(data: any) {
     this.service.searchReview(data).subscribe((response: any) => {
+      console.log(response.reviews)
       if (response.reviews[0].rating) {
         this.reviewRate = response.reviews[0].rating
       } else {
@@ -230,12 +231,12 @@ export class SearchComponent implements OnInit {
       } else {
         this.reviewName = 'no Name'
       }
-      if (response.reviews[0].text ) {
+      if (response.reviews[0].text) {
         this.reviewText = response.reviews[0].text
       } else {
         this.reviewText = 'no Text'
       }
-      if (response.reviews[0].time_created ) {
+      if (response.reviews[0].time_created) {
         this.reviewTime = response.reviews[0].time_created.slice(0, 10)
       } else {
         this.reviewTime = 'no Time'
@@ -250,12 +251,12 @@ export class SearchComponent implements OnInit {
       } else {
         this.reviewName1 = 'no Name'
       }
-      if (response.reviews[1].text ) {
+      if (response.reviews[1].text) {
         this.reviewText1 = response.reviews[1].text
       } else {
         this.reviewText1 = 'no Text'
       }
-      if (response.reviews[1].time_created ) {
+      if (response.reviews[1].time_created) {
         this.reviewTime1 = response.reviews[1].time_created.slice(0, 10)
       } else {
         this.reviewTime1 = 'no Time'
@@ -270,17 +271,17 @@ export class SearchComponent implements OnInit {
       } else {
         this.reviewName2 = 'no Name'
       }
-      if (response.reviews[2].text ) {
+      if (response.reviews[2].text) {
         this.reviewText2 = response.reviews[2].text
       } else {
         this.reviewText2 = 'no Text'
       }
-      if (response.reviews[2].time_created ) {
+      if (response.reviews[2].time_created) {
         this.reviewTime2 = response.reviews[2].time_created.slice(0, 10)
       } else {
         this.reviewTime2 = 'no Time'
       }
-      
+
     }, (error) => {
       console.log('The error is', error)
       this.reviewName = 'no Review'
@@ -324,16 +325,16 @@ export class SearchComponent implements OnInit {
 
   async getDataFromAPI(data: any) {
     var result
-    let url = `https://backend-ozaisotptq-wl.a.run.app/search/?${data}`
+    let url = `http://localhost:8080/search/?${data}`
     result = await axios.get(url)
 
-    if ( result.data['businesses'].length > 0){
+    if (result.data['businesses'].length > 0) {
       this.resultTable = result.data['businesses'];
       this.part3 = document.getElementById("part3")
       this.part3.style.display = "block"
-          // transfer result table distance from meters to miles
-      for(let i = 0; i < this.resultTable.length; ++i) {
-        this.resultTable[i]['distance'] = Math.round(parseFloat(this.resultTable[i]['distance'])/1609 );
+      // transfer result table distance from meters to miles
+      for (let i = 0; i < this.resultTable.length; ++i) {
+        this.resultTable[i]['distance'] = Math.round(parseFloat(this.resultTable[i]['distance']) / 1609);
       }
 
     } else {
@@ -352,11 +353,11 @@ export class SearchComponent implements OnInit {
   d_4html = ''
   d_5html = ''
   d_6html = ''
-  
+
 
   async getDetailTable(data: any) {
     var result
-    let url = `https://backend-ozaisotptq-wl.a.run.app/search/businessesDetail/?id=${data}`
+    let url = `http://localhost:8080/search/businessesDetail/?id=${data}`
     result = await axios.get(url)
     this.getReview(data)
     let response = result.data
@@ -366,7 +367,7 @@ export class SearchComponent implements OnInit {
     this.d_tableWithData.style.display = "block"
     this.d_tableDetail = document.getElementById("d0")
     this.d_tableDetail.style.display = "block"
-   
+
 
     var statusInt = 0
     var d_1NeedHide = false
@@ -607,8 +608,8 @@ export class SearchComponent implements OnInit {
     this.d_4html = ''
     this.d_5html = ''
     this.d_6html = ''
-    
-    this.detailCard = [{ detailName: ''}]
+
+    this.detailCard = [{ detailName: '' }]
     this.detailfb = [{ detailName: '', twitterName: '' }]
     this.detailPic = [{ pic1: '', pic2: '', pic3: '' }]
 

@@ -15,7 +15,8 @@
                             <th class="col-sm-2" id="date">Date</th>
                             <th class="col-sm-2" id="time">Time</th>
                             <th class="col-sm-4" id="email">Email</th>
-                            <th class="col-sm-2" style="padding-right: 5vh;">&nbsp;</th>
+                            <th class="col-sm-1" style="padding-right: 5vh;">&nbsp;</th>
+                            <th class="col-sm-1" style="padding-right: 5vh;">&nbsp;</th>
                         </tr>
                     </thead>
                     <tbody class="text-center" id="reservedataTable" *ngFor="let book of bookings; let i = index">
@@ -27,7 +28,83 @@
                             <td>{{book.emailtext}}</td>
                             <td><fa-icon class="pointer" [icon]="faTrashCan"
                                 style="display: inline-block;" (click)="delete(book.businessname)"></fa-icon></td>
+                                <td><fa-icon class="pointer" [icon]="faEdit"
+                                    style="display: inline-block;" (click)="edit(book.businessname)"></fa-icon></td>
                         </tr>
+                        <div class="modal" id="exampleModal" #exampleModal tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h2 class="modal-title" id="exampleModalLabel">Reservation form</h2>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p style="font-size: 18px">{{book.businessname}}</p>
+                                        <form [formGroup]="reserveForm" (ngSubmit)="toBooking(book.businessname)">
+                                            <div class="mb-3">
+                                                <label class="form-label modalTitle">Email</label>
+                                                <input type="email" class="form-control" formControlName="emailtext"
+                                                    [ngClass]="{'is-invalid':submitted && reserveForm.controls['emailtext'].errors}">
+                                                <div *ngIf="submitted && reserveForm.controls['emailtext'].errors && !reserveForm.controls['emailtext'].dirty"
+                                                    class="text-danger" style="text-align:left">Email is
+                                                    required</div>
+                                                <div *ngIf="submitted && reserveForm.controls['emailtext'].errors && (reserveForm.controls['emailtext'].dirty || reserveForm.controls['emailtext'].touched)"
+                                                    class="text-danger" style="text-align:left">Email must be a valid email
+                                                    address</div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label modalTitle">Date</label>
+                                                <input type="date" class="form-control" formControlName="datetext"
+                                                    [ngClass]="{'is-invalid':submitted && reserveForm.controls['datetext'].errors}">
+                                                <div *ngIf="submitted && reserveForm.controls['datetext'].errors"
+                                                    class="text-danger" style="text-align:left">Date is required
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label modalTitle">Time</label>
+                                                <p>&nbsp;</p>
+                                                <div class="row" style="padding-left: 12px; width:40vh">
+                                                    <div class="col-3" style="padding-right: 0px; padding-left: 0px">
+                                                        <select class="form-select" formControlName="hourtext"
+                                                            [ngClass]="{'is-invalid':submitted && reserveForm.controls['hourtext'].errors}">
+                                                            <option style="display:none"></option>
+                                                            <option value="10">10</option>
+                                                            <option value="11">11</option>
+                                                            <option value="12">12</option>
+                                                            <option value="13">13</option>
+                                                            <option value="14">14</option>
+                                                            <option value="15">15</option>
+                                                            <option value="16">16</option>
+                                                            <option value="17">17</option>
+                                                        </select>
+                                                    </div>
+                                                    &nbsp;&nbsp;&nbsp;:&nbsp;
+                                                    <div class="col-3" style="padding-right: 0px; padding-left: 0px">
+                                                        <select class="form-select" formControlName="mintext"
+                                                            [ngClass]="{'is-invalid':submitted && reserveForm.controls['mintext'].errors}">
+                                                            <option style="display:none"></option>
+                                                            <option value="00">00</option>
+                                                            <option value="15">15</option>
+                                                            <option value="30">30</option>
+                                                            <option value="45">45</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-1" style="padding-right: 0px; padding-left: 6px">
+                                                        <fa-icon [icon]="faClock" style="padding-top: 1vh; display: block;">
+                                                        </fa-icon>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button type="submit" class="btn btn-danger"
+                                                (click)="changeButton()">Submit</button>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button id="closeModalB" type="button" class="btn btn-dark"
+                                            data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </tbody>
                 </table>
             </div>

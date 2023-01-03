@@ -39,6 +39,7 @@ export class BookingsComponent implements OnInit {
 
   localStoragedata: any = []
 
+  // cancel reserve
   delete(name: any) {
     alert('Reservation cancelled!')
     for( var i = 0; i < this.bookings.length; i++){ 
@@ -78,6 +79,7 @@ export class BookingsComponent implements OnInit {
   action: any = 'Reserve Now'
   closeButton: any
 
+  // close modal
   changeButton() {
     if (this.reserveForm.invalid) {
       return
@@ -134,7 +136,5 @@ export class BookingsComponent implements OnInit {
       this.part2 = document.getElementById('part2')
       this.part2.innerHTML = ''
     }
-  }
-
-  
+  }  
 }

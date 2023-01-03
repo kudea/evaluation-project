@@ -54,8 +54,8 @@ export class SearchComponent implements OnInit {
     }
   }
 
-  myKeyword: any
-  businessesDetailID: any
+  myKeyword: string | undefined
+  businessesDetailID: string | undefined
   detailCard = [{ detailName: '' }]
   detailfb = [{ detailName: '', twitterName: '' }]
   detailPic = [{ pic1: '', pic2: '', pic3: '' }]
@@ -100,7 +100,7 @@ export class SearchComponent implements OnInit {
     console.log(localStorage)
   }
 
-  action: any = 'Reserve Now'
+  action: string = 'Reserve Now'
   closeButton: any
 
   changeButton() {
@@ -180,7 +180,7 @@ export class SearchComponent implements OnInit {
     })
   }
 
-  getKeyword(keyword: any) {
+  getKeyword(keyword: string) {
     this.myKeyword = keyword
   }
 
@@ -316,6 +316,7 @@ export class SearchComponent implements OnInit {
     while (curTime - time < littletime);
   }
 
+  // control component at html
   tableWithDataHead: any
   invalidLogData: any
   Crazy: any
@@ -347,6 +348,7 @@ export class SearchComponent implements OnInit {
 
   }
 
+  // for inner html
   d_1html = ''
   d_2html = ''
   d_3html = ''
@@ -564,7 +566,7 @@ export class SearchComponent implements OnInit {
     }
   }
 
-
+  // control component at html
   distance: any
   category: any
   onSubmit(form: any) {

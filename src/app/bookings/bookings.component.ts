@@ -40,7 +40,7 @@ export class BookingsComponent implements OnInit {
   localStoragedata: any = []
 
   // cancel reserve
-  delete(name: any) {
+  delete(name: string) {
     alert('Reservation cancelled!')
     for( var i = 0; i < this.bookings.length; i++){ 
       if ( this.bookings[i].businessname == name) { 
@@ -76,7 +76,7 @@ export class BookingsComponent implements OnInit {
     console.log(localStorage)
   }
 
-  action: any = 'Reserve Now'
+  action: string = 'Reserve Now'
   closeButton: any
 
   // close modal

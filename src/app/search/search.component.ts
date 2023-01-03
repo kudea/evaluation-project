@@ -84,7 +84,7 @@ export class SearchComponent implements OnInit {
   // control reserve form
   bookings: booking | undefined
   reserveForm !: FormGroup
-  submitted = false
+  submitted: boolean = false
 
   toBooking(name: any) {
     this.submitted = true
@@ -319,7 +319,7 @@ export class SearchComponent implements OnInit {
   // control component at html
   tableWithDataHead: any
   invalidLogData: any
-  Crazy: any
+  submitFrom: any
   d_tableWithData: any
   d_tableDetail: any
   part3: any
@@ -596,8 +596,8 @@ export class SearchComponent implements OnInit {
 
   clearForm() {
     // set all things to default (orgin one)
-    this.Crazy = document.getElementById("Crazy")
-    this.Crazy.reset()
+    this.submitFrom = document.getElementById("submitFrom")
+    this.submitFrom.reset()
     this.invalidLogData = document.getElementById("invalidLog")
     this.invalidLogData.innerHTML = ''
 

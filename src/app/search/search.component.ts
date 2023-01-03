@@ -86,7 +86,7 @@ export class SearchComponent implements OnInit {
   reserveForm !: FormGroup
   submitted: boolean = false
 
-  toBooking(name: any) {
+  toBooking(name: string) {
     this.submitted = true
     if (this.reserveForm.invalid) {
       return
@@ -163,7 +163,7 @@ export class SearchComponent implements OnInit {
   }
 
   // search form
-  wantSpinner = false
+  wantSpinner: boolean = false
 
   // input form
   myControl = new FormControl('')
@@ -185,7 +185,7 @@ export class SearchComponent implements OnInit {
   }
 
   options = ['']
-  getAutoComplete(dataFromfindWord: any) {
+  getAutoComplete(dataFromfindWord: string) {
     this.getKeyword(dataFromfindWord)
 
     this.service.autoComplete(dataFromfindWord).subscribe((response: any) => {
@@ -218,7 +218,7 @@ export class SearchComponent implements OnInit {
   reviewText2 = ''
   reviewTime2 = ''
 
-  getReview(data: any) {
+  getReview(data: string) {
     this.service.searchReview(data).subscribe((response: any) => {
       console.log(response.reviews)
       if (response.reviews[0].rating) {
@@ -324,7 +324,7 @@ export class SearchComponent implements OnInit {
   d_tableDetail: any
   part3: any
 
-  async getDataFromAPI(data: any) {
+  async getDataFromAPI(data: string) {
     var result
     let url = `http://localhost:8080/search/?${data}`
     result = await axios.get(url)
@@ -357,7 +357,7 @@ export class SearchComponent implements OnInit {
   d_6html = ''
 
 
-  async getDetailTable(data: any) {
+  async getDetailTable(data: string) {
     var result
     let url = `http://localhost:8080/search/businessesDetail/?id=${data}`
     result = await axios.get(url)
@@ -592,7 +592,7 @@ export class SearchComponent implements OnInit {
     this.getDataFromAPI(data)
   }
 
-  tabIndex: any
+  tabIndex: number | undefined
 
   clearForm() {
     // set all things to default (orgin one)

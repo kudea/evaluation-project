@@ -62,7 +62,7 @@ export class BookingsComponent implements OnInit {
   reserveForm !: FormGroup
   submitted: boolean = false
 
-  toBooking(name: any) {
+  toBooking(name: string) {
     this.submitted = true
     if (this.reserveForm.invalid) {
       return

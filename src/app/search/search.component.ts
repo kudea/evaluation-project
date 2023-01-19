@@ -38,7 +38,6 @@ export class SearchComponent implements OnInit {
   }
 
   // Search Form Part
-
   // input form
   myControl = new FormControl('')
 

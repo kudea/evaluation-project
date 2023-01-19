@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { AppServiceService } from '../app-service.service';
 import { booking } from '../booking';
-import { BOOKINGS } from '../bookingTable';
 import { faTrashAlt, faTrashCan, faEdit, faClock } from '@fortawesome/free-regular-svg-icons';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Modal } from 'bootstrap'
+import { Modal } from 'bootstrap';
 
-declare var bootstrap: any;
-declare var window: any;
+declare let bootstrap: { 
+  Carousel: new (arg0: any, arg1: { ride: string; interval: number; }) => any; 
+  Modal: new (arg0: HTMLElement | null, arg1: { keyboard: boolean; }) => Modal | undefined; 
+}
+declare let window: { location: { href: string; }; }
 
 @Component({
   selector: 'app-bookings',
@@ -15,18 +16,11 @@ declare var window: any;
   styleUrls: ['./bookings.component.css']
 })
 export class BookingsComponent implements OnInit {
-  bookings: booking[] = []
 
-  // icon
-  faTrashAlt = faTrashAlt
-  faTrashCan = faTrashCan
-  faEdit = faEdit
-  faClock = faClock
-
-  constructor(private service: AppServiceService, private formBuilder: FormBuilder) { }
+  constructor(private formBuilder: FormBuilder) { }
 
   ngOnInit(): void {
-    this.bookingTable()
+    this.getBookingTable()
     this.tableControl()
     // reserve info validators
     this.reserveForm = this.formBuilder.group({
@@ -37,28 +31,52 @@ export class BookingsComponent implements OnInit {
     })
   }
 
+  // icon
+  faTrashAlt = faTrashAlt
+  faTrashCan = faTrashCan
+  faEdit = faEdit
+  faClock = faClock
+
+  // for booking table
+  bookings: booking[] = []
+
+  // for web storage
   localStoragedata: any = []
 
-  // cancel reserve
+  // build booking table
+  getBookingTable(): void {
+    for (let i = 0, len = localStorage.length; i < len; i++) {
+      // get data from localStorage
+      let data: any = localStorage.getItem(localStorage.key(i)!);
+      let parse_date = JSON.parse(data || null);
+      this.bookings.push(parse_date);
+    }
+  }
+
+  // cancel reserve form
   delete(name: string) {
     alert('Reservation cancelled!')
-    for( var i = 0; i < this.bookings.length; i++){ 
-      if ( this.bookings[i].businessname == name) { 
+    
+    for (let i = 0; i < this.bookings.length; i++) {
+      if (this.bookings[i].businessname == name) {
         this.bookings.splice(i, 1)
-        i--
+        break
       }
     }
-    for( var i = 0; i < BOOKINGS.length; i++){ 
-      if ( BOOKINGS[i].businessname == name) { 
-        BOOKINGS.splice(i, 1)
-        i--
-      }
-    }
+
     localStorage.removeItem(name)
     this.tableControl()
   }
 
-  // control reserve form
+  // isBooking(bookings: booking, name: string) {
+  //   if (bookings.businessname == name) {
+  //     const index = bookings.businessname.indexOf(name, 0);
+  //     this.bookings.splice(index, 1)
+  //   }
+  //   return bookings;
+  // }
+
+  // edit reserve form
   reserveForm !: FormGroup
   submitted: boolean = false
 
@@ -71,25 +89,21 @@ export class BookingsComponent implements OnInit {
   }
 
   getBooking(data: any, name: string) {
-    BOOKINGS.push({ businessname: name, emailtext: data.emailtext, datetext: data.datetext, hourtext: data.hourtext, mintext: data.mintext })
+
     localStorage.setItem(name, JSON.stringify({ businessname: name, emailtext: data.emailtext, datetext: data.datetext, hourtext: data.hourtext, mintext: data.mintext }))
     console.log(localStorage)
   }
 
-  action: string = 'Reserve Now'
   closeButton: any
 
-  // close modal
-  changeButton() {
+  // close reserve modal
+  closeModal() {
     if (this.reserveForm.invalid) {
       return
     }
-    if (this.action == 'Reserve Now') {
-      this.action = 'Cancel reservation'
-      alert('Reservation edited!')
-      this.closeButton = document.getElementById('closeModalB')
-      this.closeButton.click()
-    }
+    alert('Reservation edited!')
+    this.closeButton = document.getElementById('closeModalB')
+    this.closeButton.click()
     window.location.href = "/bookings"
   }
 
@@ -101,24 +115,12 @@ export class BookingsComponent implements OnInit {
     this.myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {
       keyboard: false
     })
+    console.log(name+' is editing!')
     this.myModal?.show()
     this.tableControl()
   }
 
-  // build booking table
-  bookingTable(): void {
-    this.service.getBookings()
-      .subscribe(bookings => {
-        for (var i = 0, len = localStorage.length; i < len; i++) {
-          this.localStoragedata[i] = localStorage.getItem(localStorage.key(i)||'')
-          this.bookings.push(JSON.parse(this.localStoragedata[i]))
-        }
-        console.log(this.bookings)
-        console.log(localStorage)
-      })
-  }
-
-  // innerHTML
+  // html component
   part1: any
   part2: any
   title: any
@@ -126,15 +128,15 @@ export class BookingsComponent implements OnInit {
   tableControl() {
     if (this.bookings.length == 0) {
       this.part1 = document.getElementById('part1')
-      this.part1.innerHTML= ''
+      this.part1.innerHTML = ''
       this.part2 = document.getElementById('part2')
       this.part2.innerHTML = `<div class="container-sm text-center" style="max-width: 400px; color: red; font-size: 22px;">
       <div style="border-radius: 30px; background-color: white;">No reservations to show</div>
       </div>`
-      this.bookings.length = 0 
+      this.bookings.length = 0
     } else {
       this.part2 = document.getElementById('part2')
       this.part2.innerHTML = ''
     }
-  }  
+  }
 }

@@ -1,8 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of} from 'rxjs';
-import { booking } from './booking';
-import { BOOKINGS } from './bookingTable';
 
 
 @Injectable({
@@ -22,9 +19,5 @@ export class AppServiceService {
     return this.http.get(`http://localhost:8080/search/review/?id=${data}`)
   }
 
-  getBookings(): Observable<booking[]>{
-    const bookings = of(BOOKINGS);
-    return bookings
-  }
 
 }

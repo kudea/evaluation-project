@@ -204,28 +204,12 @@
                         <mat-tab label="Reviews">
                             <table class="table table-striped">
                                 <tbody id="reviewTable" style="text-align: left;">
-                                    <tr>
+                                    <tr *ngFor="let data of reviewData;">
                                         <td class="col">
-                                            <strong>{{reviewName}}</strong><br>
-                                            Rating: {{reviewRate}}/5<br><br>
-                                            {{reviewText}}<br><br>
-                                            {{reviewTime}}<br><br>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="col">
-                                            <strong>{{reviewName1}}</strong><br>
-                                            Rating: {{reviewRate1}}/5<br><br>
-                                            {{reviewText1}}<br><br>
-                                            {{reviewTime1}}<br><br>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="col">
-                                            <strong>{{reviewName2}}</strong><br>
-                                            Rating: {{reviewRate2}}/5<br><br>
-                                            {{reviewText2}}<br><br>
-                                            {{reviewTime2}}<br><br>
+                                            <strong>{{data.user.name}}</strong><br>
+                                            Rating: {{data.rating}}/5<br><br>
+                                            {{data.text}}<br><br>
+                                            {{data.time_created}}<br><br>
                                         </td>
                                     </tr>
                                 </tbody>

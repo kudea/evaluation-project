@@ -4,12 +4,15 @@ import { AppServiceService } from '../app-service.service';
 import { faTwitter, faFacebookSquare } from '@fortawesome/free-brands-svg-icons';
 import { faClock } from '@fortawesome/free-regular-svg-icons';
 import { Modal } from 'bootstrap';
-import { booking } from '../booking';
+import { AutoComplete } from '../autocomplete'
+import { IpInfo } from '../ipinfo';
 import axios from 'axios';
+import { either as E, nonEmptyArray as A, number, string } from 'fp-ts';
 
-declare let bootstrap: { 
-  Carousel: new (arg0: any, arg1: { ride: string; interval: number; }) => any; 
-  Modal: new (arg0: HTMLElement | null, arg1: { keyboard: boolean; }) => Modal | undefined; 
+
+declare let bootstrap: {
+  Carousel: new (arg0: any, arg1: { ride: string; interval: number; }) => any;
+  Modal: new (arg0: HTMLElement | null, arg1: { keyboard: boolean; }) => Modal | undefined;
 }
 
 @Component({
@@ -29,12 +32,44 @@ export class SearchComponent implements OnInit {
 
     // reserve info validators
     this.reserveForm = this.formBuilder.group({
-      emailtext: ['', [Validators.required, Validators.email]],
+      emailtext: ['', [Validators.required, this.noSpaceAllow, this.validateAtSign, this.validateAddress, this.validateDomain]],
       datetext: ['', Validators.required],
       hourtext: ['', Validators.required],
       mintext: ['', Validators.required]
     })
 
+  }
+
+  // Validator
+  noSpaceAllow(control: FormGroup) {
+    if (control.value != null && control.value.indexOf(' ') != -1) {
+      return { noSpaceAllow: true }
+    }
+    return null
+  }
+
+  validateAtSign(control: FormGroup) {
+    if (!control.value.includes('@')) {
+      return { validateAtSign: true }
+      // Email must contain "@" sign
+    }
+    return null
+  }
+
+  validateAddress(control: FormGroup) {
+    if (control.value.split('@')[0]?.length === 0) {
+      return { validateAddress: true }
+      // Email local-part must be present
+    }
+    return null
+  }
+
+  validateDomain(control: FormGroup) {
+    if (!/\w+\.\w{2,}/ui.test(control.value.split('@')[1])) {
+      return { validateDomain: true }
+      // Email domain must be in form "example.tld"
+    }
+    return null
   }
 
   // Search Form Part
@@ -45,12 +80,17 @@ export class SearchComponent implements OnInit {
   wantSpinner: boolean = false
   // filter for autoConplete
   findWord() {
-    this.myControl.valueChanges.subscribe((response: any) => {
-      if (response.length > 1) {
-        this.wantSpinner = true
-        this.getAutoComplete(response)
-      } else {
-        this.getAutoComplete('')
+    this.myControl.valueChanges.subscribe((response: string | null) => {
+      if (response != null) {
+        if (response.length > 1) {
+          this.wantSpinner = true
+          this.getAutoComplete(response)
+        } else {
+          this.getAutoComplete('')
+        }
+      }
+      else {
+        console.error('error response')
       }
     })
   }
@@ -59,44 +99,53 @@ export class SearchComponent implements OnInit {
     this.myKeyword = keyword
   }
 
-  options = ['']
-  getAutoComplete(dataFromfindWord: string) {
-    this.getKeyword(dataFromfindWord)
+  options: Array<string> = ['']
+  async getAutoComplete(dataFromfindWord: string) {
 
-    this.service.autoComplete(dataFromfindWord).subscribe((response: any) => {
-      this.options.length = 0
-      this.wantSpinner = false
-      if (Array.isArray(response.categories)) {
-        for (let i = 0; i < response.categories.length; i++) {
-          this.options.push(response.categories[i].title)
-        }
+    this.getKeyword(dataFromfindWord)
+    const AutoComplete = Object({
+      title: string,
+      views: number
+    });
+    const fetchData = async (request: RequestInfo): Promise<any> => {
+      const response = await fetch(request)
+      const body = await response.json()
+      return body
+    }
+
+    type AutoComplete = ReturnType<typeof AutoComplete>
+    const ACData: AutoComplete = await fetchData(`http://localhost:8080/search/autocomplete/?word=${dataFromfindWord}`)
+    this.options.length = 0
+    this.wantSpinner = false
+    if (Array.isArray(ACData.categories)) {
+      for (let i = 0; i < ACData.categories.length; i++) {
+        this.options.push(ACData.categories[i].title)
       }
-      if (Array.isArray(response.terms)) {
-        for (let i = 0; i < response.terms.length; i++) {
-          this.options.push(response.terms[i].text)
-        }
+    }
+    if (Array.isArray(ACData.terms)) {
+      for (let i = 0; i < ACData.terms.length; i++) {
+        this.options.push(ACData.terms[i].text)
       }
-    }, (error) => {
-      console.log('The error is', error)
-    })
+    }
+    console.log(ACData)
+
   }
 
-
-  // locC is the html component
-  locC: HTMLInputElement = document.getElementById("loc") as HTMLInputElement
-  
   // locationApi is a string store latitude and longitude as a string
   locationApi: string = ''
   // cB is the check button at html
-  locControl(cB: any) {
 
-    this.locC.disabled = cB.srcElement.checked ? true : false
+  locControl(cB: any) {
+    let locC: HTMLInputElement = document.getElementById('loc') as HTMLInputElement
+    locC.disabled = cB.srcElement.checked ? true : false
 
     if (cB.srcElement.checked) {
-      this.locC.value = ""
+      locC.value = ""
+      // transfer to JSON then do processing
       fetch('https://ipinfo.io/76.175.122.164?token=fa2da888e74da4')
-        .then((response) => response.json())
-        .then((data: any) => {
+        .then((response: Response) => response.json())
+        .then((data: IpInfo) => {
+          // data is the response data from ipinfo api
           this.locationApi = data.loc
           console.log(this.locationApi)
         })
@@ -106,12 +155,12 @@ export class SearchComponent implements OnInit {
   // Submit Search Form Part
 
   onSubmit(form: any) {
-    let data : string = ""
-    let keyword = this.myKeyword
-    let distance : HTMLInputElement = document.getElementById("dist") as HTMLInputElement
-    let category : HTMLInputElement = document.getElementById("cate") as HTMLInputElement
+    let data: string = ""
+    let keyword: string = this.myKeyword
+    let distance: HTMLInputElement = document.getElementById("dist") as HTMLInputElement
+    let category: HTMLInputElement = document.getElementById("cate") as HTMLInputElement
     let location = form.value.loc
-    let checkbox = this.locationApi
+    let checkbox: string = this.locationApi
 
     if (distance.value != "") {
       console.log("Here comes value", distance.value)
@@ -134,12 +183,14 @@ export class SearchComponent implements OnInit {
     // set all things to default (orgin one)
     const submitFrom = document.getElementById("submitFrom") as HTMLFormElement
     submitFrom.reset()
-    
+    this.invalidLogData = document.getElementById("invalidLog") as HTMLInputElement
     this.invalidLogData.innerHTML = ''
 
     history.pushState("", document.title, window.location.pathname + window.location.search)
 
-    this.locC.disabled = false
+    // return location input to default setting
+    let locC: HTMLInputElement = document.getElementById('loc') as HTMLInputElement
+    locC.disabled = false
     this.d_1html = ''
     this.d_2html = ''
     this.d_3html = ''
@@ -152,8 +203,7 @@ export class SearchComponent implements OnInit {
     this.detailPic = [{ pic1: '', pic2: '', pic3: '' }]
 
     this.exitDetail()
-
-    this.part3 = document.getElementById("part3")
+    this.part3 = document.getElementById("part3") as HTMLInputElement
     this.part3.style.display = "none"
     this.tabIndex = 0
     this.action = "Reserve Now"
@@ -163,9 +213,8 @@ export class SearchComponent implements OnInit {
 
   // Search Result Part
   // declare html component
-  invalidLogData : HTMLInputElement = document.getElementById("invalidLog") as HTMLInputElement
-  part3: any
-
+  invalidLogData: HTMLInputElement = document.getElementById("invalidLog") as HTMLInputElement
+  part3: HTMLInputElement = document.getElementById("part3") as HTMLInputElement
   // search result table
   resultTable: any = []
 
@@ -176,7 +225,7 @@ export class SearchComponent implements OnInit {
 
     if (result.data['businesses'].length > 0) {
       this.resultTable = result.data['businesses'];
-      this.part3 = document.getElementById("part3")
+      this.part3 = document.getElementById("part3") as HTMLInputElement
       this.part3.style.display = "block"
       // transfer result table distance from meters to miles
       for (let i = 0; i < this.resultTable.length; ++i) {
@@ -184,7 +233,7 @@ export class SearchComponent implements OnInit {
       }
 
     } else {
-      
+
       this.invalidLogData.innerHTML =
         `<div class="container-sm text-center" style="max-width: 400px; color: red; font-size: 22px;">
           <div style="border-radius: 30px; background-color: white;">No results available</div>
@@ -203,9 +252,11 @@ export class SearchComponent implements OnInit {
   faClock = faClock
 
   // detail section
-  detailData: any = {
-    name: null
-  }
+  detailData: {
+    name: string;
+  } = {
+      name: ''
+    }
 
   // carousel image
   myCarousel: HTMLInputElement = document.getElementById('carouselExampleControls') as HTMLInputElement
@@ -221,7 +272,7 @@ export class SearchComponent implements OnInit {
   }
 
   stopAuto() {
-    this.myCarousel = document.getElementById('carouselExampleControls')  as HTMLInputElement
+    this.myCarousel = document.getElementById('carouselExampleControls') as HTMLInputElement
     try {
       this.carousel.pause()
     } catch (e) {
@@ -231,9 +282,18 @@ export class SearchComponent implements OnInit {
 
   // for detail tab
   myKeyword: string = ''
-  detailCard = [{ detailName: '' }]
-  detailfb = [{ detailName: '', twitterName: '' }]
-  detailPic = [{ pic1: '', pic2: '', pic3: '' }]
+  detailCard: {
+    detailName: string;
+  }[] = [{ detailName: '' }]
+  detailfb: {
+    detailName: string;
+    twitterName: string;
+  }[] = [{ detailName: '', twitterName: '' }]
+  detailPic: {
+    pic1: string;
+    pic2: string;
+    pic3: string;
+  }[] = [{ pic1: '', pic2: '', pic3: '' }]
 
   // for inner html
   d_1html: string = ''
@@ -246,15 +306,15 @@ export class SearchComponent implements OnInit {
 
   async getDetailTable(data: string) {
 
-    let url = `http://localhost:8080/search/businessesDetail/?id=${data}`
+    let url: string = `http://localhost:8080/search/businessesDetail/?id=${data}`
     let result = await axios.get(url)
     this.getReview(data)
     let response = result.data
     console.log(response)
 
-    let d_tableWithData : HTMLInputElement = document.getElementById("lastone") as HTMLInputElement
+    let d_tableWithData: HTMLInputElement = document.getElementById("lastone") as HTMLInputElement
     d_tableWithData.style.display = "block"
-    let d_tableDetail : HTMLInputElement = document.getElementById("d0") as HTMLInputElement
+    let d_tableDetail: HTMLInputElement = document.getElementById("d0") as HTMLInputElement
     d_tableDetail.style.display = "block"
 
 
@@ -273,7 +333,7 @@ export class SearchComponent implements OnInit {
     this.maplng = response.coordinates.longitude
 
 
-    let d_address = ""
+    let d_address: string = ""
     if (response.location.display_address == undefined) {
       d_1NeedHide = true
     }
@@ -290,7 +350,7 @@ export class SearchComponent implements OnInit {
       }
     }
 
-    let d_phone = ""
+    let d_phone: string = ""
     if (response.display_phone == undefined) {
       d_2NeedHide = true
     } else {
@@ -309,7 +369,7 @@ export class SearchComponent implements OnInit {
       }
     }
 
-    let d_cate = ""
+    let d_cate: string = ""
     if (response.categories == undefined) {
       d_4NeedHide = true
     }
@@ -329,7 +389,7 @@ export class SearchComponent implements OnInit {
       }
     }
 
-    let d_price = ""
+    let d_price: string = ""
     if (response.price == undefined) {
       d_5NeedHide = true
     }
@@ -337,7 +397,7 @@ export class SearchComponent implements OnInit {
       d_price = response.price
     }
 
-    let d_url = ""
+    let d_url: string = ""
     if (response.url == undefined) {
       d_6NeedHide = true
     }
@@ -455,7 +515,6 @@ export class SearchComponent implements OnInit {
 
   // Dailog Part At Detail Tab
   // control reserve form
-  bookings: booking[] = []
   reserveForm !: FormGroup
   submitted: boolean = false
 
@@ -481,33 +540,32 @@ export class SearchComponent implements OnInit {
     if (this.action == 'Reserve Now') {
       this.action = 'Cancel reservation'
       alert('Reservation created!')
-      let closeButton : HTMLInputElement = document.getElementById('closeModalB') as HTMLInputElement
+      let closeButton: HTMLInputElement = document.getElementById('closeModalB') as HTMLInputElement
       closeButton.click()
     }
 
   }
 
   // open reserve form
-  myModal: Modal | undefined
-
   openBook(name: string) {
     if (this.action == 'Cancel reservation') {
       this.action = 'Reserve Now'
       alert('Reservation cancelled!')
       localStorage.removeItem(name)
     } else {
-      this.myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {
+      let myModal = new bootstrap.Modal(document.getElementById('exampleModal') as HTMLElement, {
         keyboard: false
       })
-      this.myModal?.show()
+      myModal?.show()
     }
   }
 
-  getShow : HTMLInputElement = document.getElementById("d0") as HTMLInputElement
+  getShow: HTMLInputElement = document.getElementById("d0") as HTMLInputElement
 
   exitDetail() {
-    this.part3 = document.getElementById("part3")
+    this.part3 = document.getElementById("part3") as HTMLInputElement
     this.part3.style.display = "block"
+    this.getShow = document.getElementById("d0") as HTMLInputElement
     this.getShow.style.display = "none"
     this.stopAuto()
     this.tabIndex = 0
@@ -517,8 +575,9 @@ export class SearchComponent implements OnInit {
 
     if (e0) {
       e0.onclick = (e) => {
-        this.part3 = document.getElementById("part3")
+        this.part3 = document.getElementById("part3") as HTMLInputElement
         this.part3.style.display = "none"
+        this.getShow = document.getElementById("d0") as HTMLInputElement
         this.getShow.style.display = "block"
       }
     }

@@ -94,49 +94,40 @@ export class BookingsComponent implements OnInit {
     console.log(localStorage)
   }
 
-  closeButton: any
-
   // close reserve modal
   closeModal() {
     if (this.reserveForm.invalid) {
       return
     }
     alert('Reservation edited!')
-    this.closeButton = document.getElementById('closeModalB')
-    this.closeButton.click()
+    let closeButton : HTMLInputElement = document.getElementById('closeModalB') as HTMLInputElement
+    closeButton.click()
     window.location.href = "/bookings"
   }
 
-  // open reserve form
-  myModal: Modal | undefined
-
+  // open edit reserve form
   edit(name: string) {
 
-    this.myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {
+    let myModal = new bootstrap.Modal(document.getElementById('exampleModal') as HTMLElement, {
       keyboard: false
     })
     console.log(name+' is editing!')
-    this.myModal?.show()
+    myModal?.show()
     this.tableControl()
   }
 
-  // html component
-  part1: any
-  part2: any
-  title: any
 
   tableControl() {
+    let part1 : HTMLInputElement = document.getElementById('part1') as HTMLInputElement
+    let part2 : HTMLInputElement = document.getElementById('part2') as HTMLInputElement
     if (this.bookings.length == 0) {
-      this.part1 = document.getElementById('part1')
-      this.part1.innerHTML = ''
-      this.part2 = document.getElementById('part2')
-      this.part2.innerHTML = `<div class="container-sm text-center" style="max-width: 400px; color: red; font-size: 22px;">
+      part1.innerHTML = ''
+      part2.innerHTML = `<div class="container-sm text-center" style="max-width: 400px; color: red; font-size: 22px;">
       <div style="border-radius: 30px; background-color: white;">No reservations to show</div>
       </div>`
       this.bookings.length = 0
     } else {
-      this.part2 = document.getElementById('part2')
-      this.part2.innerHTML = ''
+      part2.innerHTML = ''
     }
   }
 }

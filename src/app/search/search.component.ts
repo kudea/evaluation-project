@@ -4,11 +4,8 @@ import { AppServiceService } from '../app-service.service';
 import { faTwitter, faFacebookSquare } from '@fortawesome/free-brands-svg-icons';
 import { faClock } from '@fortawesome/free-regular-svg-icons';
 import { Modal } from 'bootstrap';
-import { AutoComplete } from '../autocomplete'
 import { IpInfo } from '../ipinfo';
 import axios from 'axios';
-import { either as E, nonEmptyArray as A, number, string } from 'fp-ts';
-
 
 declare let bootstrap: {
   Carousel: new (arg0: any, arg1: { ride: string; interval: number; }) => any;
@@ -103,10 +100,40 @@ export class SearchComponent implements OnInit {
   async getAutoComplete(dataFromfindWord: string) {
 
     this.getKeyword(dataFromfindWord)
-    const AutoComplete = Object({
-      title: string,
-      views: number
+
+    type TypeGuard<T> = (val: unknown) => T;
+    const string: TypeGuard<string> = (val: unknown) => {
+      if (typeof val !== 'string') throw new Error();
+      return val;
+    }
+    const array = <T>(inner: TypeGuard<T>) => (val: unknown): T[] => {
+      if (!Array.isArray(val)) throw new Error();
+      return val.map(inner);
+    }
+    const object = <T extends Record<string, TypeGuard<any>>>(inner: T) => {
+      return (val: unknown): { [P in keyof T]: ReturnType<T[P]> } => {
+        if (val === null || typeof val !== 'object') throw new Error();
+
+        const out: { [P in keyof T]: ReturnType<T[P]> } = {} as any;
+
+        for (const k in inner) {
+          out[k] = inner[k]((val as any)[k])
+        }
+
+        return out
+      }
+    }
+    const AutoComplete = object({
+      categories: array(object({
+        alias: string,
+        title: string
+      })),
+      businesses: string,
+      terms: array(object({
+        text: string
+      }))
     });
+
     const fetchData = async (request: RequestInfo): Promise<any> => {
       const response = await fetch(request)
       const body = await response.json()
@@ -114,6 +141,7 @@ export class SearchComponent implements OnInit {
     }
 
     type AutoComplete = ReturnType<typeof AutoComplete>
+
     const ACData: AutoComplete = await fetchData(`http://localhost:8080/search/autocomplete/?word=${dataFromfindWord}`)
     this.options.length = 0
     this.wantSpinner = false

@@ -5,12 +5,156 @@ import { faTwitter, faFacebookSquare } from '@fortawesome/free-brands-svg-icons'
 import { faClock } from '@fortawesome/free-regular-svg-icons';
 import { Modal } from 'bootstrap';
 import { IpInfo } from '../ipinfo';
+import { searchResultData } from '../searchResultData'
 import axios from 'axios';
+import { either as E, nonEmptyArray as A } from 'fp-ts';
+import Either = E.Either;
 
 declare let bootstrap: {
   Carousel: new (arg0: any, arg1: { ride: string; interval: number; }) => any;
   Modal: new (arg0: HTMLElement | null, arg1: { keyboard: boolean; }) => Modal | undefined;
 }
+
+// ensure the response is valid
+type TypeGuard<T> = (val: unknown) => T;
+const string: TypeGuard<string> = (val: unknown) => {
+  if (typeof val !== 'string') throw new Error();
+  return val;
+}
+const number: TypeGuard<number> = (val: unknown) => {
+  if (typeof val !== 'number') throw new Error();
+  return val;
+}
+const boolean: TypeGuard<boolean> = (val: unknown) => {
+  if (typeof val !== 'boolean') throw new Error();
+  return val;
+}
+const array = <T>(inner: TypeGuard<T>) => (val: unknown): T[] => {
+  if (!Array.isArray(val)) throw new Error();
+  return val.map(inner);
+}
+const object = <T extends Record<string, TypeGuard<any>>>(inner: T) => {
+  return (val: unknown): { [P in keyof T]: ReturnType<T[P]> } => {
+    if (val === null || typeof val !== 'object') throw new Error();
+    const out: { [P in keyof T]: ReturnType<T[P]> } = {} as any;
+    for (const k in inner) {
+      out[k] = inner[k]((val as any)[k])
+    }
+    return out
+  }
+}
+
+
+const AutoComplete = object({
+  categories: array(object({
+    alias: string,
+    title: string
+  })),
+  businesses: string,
+  terms: array(object({
+    text: string
+  }))
+})
+
+const SearchResult = object({
+  businesses: array(object({
+    id: string,
+    alias: string,
+    name: string,
+    image_url: string,
+    is_closed: boolean,
+    url: string,
+    review_count: number,
+    categories: array(object({
+      alias: string,
+      title: string
+    })),
+    rating: number,
+    coordinates: object({
+      latitude: number,
+      longitude: number
+    }),
+    transactions: array(string),
+    price: string,
+    location: object({
+      address1: string,
+      address2: string,
+      address3: string,
+      city: string,
+      zip_code: string,
+      country: string,
+      state: string,
+      display_address: array(string),
+    }),
+    phone: string,
+    display_phone: string,
+    distance: number
+  }))
+})
+
+const DetailResult = object({
+  id: string,
+  alias: string,
+  name: string,
+  image_url: string,
+  is_claimed: boolean,
+  is_closed: boolean,
+  url: string,
+  phone: string,
+  display_phone: string,
+  review_count: number,
+  categories: array(object({
+    alias: string,
+    title: string
+  })),
+  rating: number,
+  location: object({
+    address1: string,
+    address2: string,
+    address3: string,
+    city: string,
+    zip_code: string,
+    country: string,
+    state: string,
+    display_address: array(string),
+    cross_streets: string
+  }),
+  coordinates: object({
+    latitude: number,
+    longitude: number
+  }),
+  photos: array(string),
+  price: string,
+  hours: array(object({
+    open: array(object({
+      is_overnight: boolean,
+      start: string,
+      end: string,
+      day: number
+    })),
+    hours_type: string,
+    is_open_now: boolean
+  })),
+  transactions: array(string)
+})
+
+const ReviewData = object({
+  reviews: array(object({
+    id: string,
+    url: string,
+    text: string,
+    rating: number,
+    time_created: string,
+    user: object({
+      id: string,
+      profile_url: string,
+      image_url: string,
+      name: string
+    })
+  })),
+  total: number,
+  possible_languages: array(string)
+})
 
 @Component({
   selector: 'app-search',
@@ -48,9 +192,10 @@ export class SearchComponent implements OnInit {
   validateAtSign(control: FormGroup) {
     if (!control.value.includes('@')) {
       return { validateAtSign: true }
+      // return E.right(true);
       // Email must contain "@" sign
     }
-    return null
+    return E.left('Email must contain "@" sign')
   }
 
   validateAddress(control: FormGroup) {
@@ -100,39 +245,6 @@ export class SearchComponent implements OnInit {
   async getAutoComplete(dataFromfindWord: string) {
 
     this.getKeyword(dataFromfindWord)
-
-    type TypeGuard<T> = (val: unknown) => T;
-    const string: TypeGuard<string> = (val: unknown) => {
-      if (typeof val !== 'string') throw new Error();
-      return val;
-    }
-    const array = <T>(inner: TypeGuard<T>) => (val: unknown): T[] => {
-      if (!Array.isArray(val)) throw new Error();
-      return val.map(inner);
-    }
-    const object = <T extends Record<string, TypeGuard<any>>>(inner: T) => {
-      return (val: unknown): { [P in keyof T]: ReturnType<T[P]> } => {
-        if (val === null || typeof val !== 'object') throw new Error();
-
-        const out: { [P in keyof T]: ReturnType<T[P]> } = {} as any;
-
-        for (const k in inner) {
-          out[k] = inner[k]((val as any)[k])
-        }
-
-        return out
-      }
-    }
-    const AutoComplete = object({
-      categories: array(object({
-        alias: string,
-        title: string
-      })),
-      businesses: string,
-      terms: array(object({
-        text: string
-      }))
-    });
 
     const fetchData = async (request: RequestInfo): Promise<any> => {
       const response = await fetch(request)
@@ -248,11 +360,16 @@ export class SearchComponent implements OnInit {
 
   async getDataFromAPI(data: string) {
 
-    let url = `http://localhost:8080/search/?${data}`
-    let result = await axios.get(url)
+    const fetchData = async (request: RequestInfo): Promise<any> => {
+      const response = await fetch(request)
+      const body = await response.json()
+      return body
+    }
+    type SearchResult = ReturnType<typeof SearchResult>
+    const result: SearchResult = await fetchData(`http://localhost:8080/search/?${data}`)
 
-    if (result.data['businesses'].length > 0) {
-      this.resultTable = result.data['businesses'];
+    if (result.businesses.length > 0) {
+      this.resultTable = result.businesses
       this.part3 = document.getElementById("part3") as HTMLInputElement
       this.part3.style.display = "block"
       // transfer result table distance from meters to miles
@@ -272,19 +389,13 @@ export class SearchComponent implements OnInit {
 
   // Search Detail Part
   // for detail tab
-
-
   // icon
   faTwitter = faTwitter
   faFacebookSquare = faFacebookSquare
   faClock = faClock
 
   // detail section
-  detailData: {
-    name: string;
-  } = {
-      name: ''
-    }
+  detailData: { name: string; } = { name: '' }
 
   // carousel image
   myCarousel: HTMLInputElement = document.getElementById('carouselExampleControls') as HTMLInputElement
@@ -333,11 +444,16 @@ export class SearchComponent implements OnInit {
 
 
   async getDetailTable(data: string) {
+    const fetchData = async (request: RequestInfo): Promise<any> => {
+      const response = await fetch(request)
+      const body = await response.json()
+      return body
+    }
+    type DetailResult = ReturnType<typeof DetailResult>
+    const result: DetailResult = await fetchData(`http://localhost:8080/search/businessesDetail/?id=${data}`)
 
-    let url: string = `http://localhost:8080/search/businessesDetail/?id=${data}`
-    let result = await axios.get(url)
     this.getReview(data)
-    let response = result.data
+    let response = result
     console.log(response)
 
     let d_tableWithData: HTMLInputElement = document.getElementById("lastone") as HTMLInputElement
@@ -623,18 +739,20 @@ export class SearchComponent implements OnInit {
   // deal with indivialual case
   reviewData: any = []
 
-  getReview(data: string) {
-    this.service.searchReview(data).subscribe((response: any) => {
-      console.log(response.reviews)
-      this.reviewData = response.reviews;
-      for (let i = 0; i < this.reviewData.length; ++i) {
-        this.reviewData[i].time_created = this.reviewData[i].time_created.slice(0, 10);
-      }
+  async getReview(data: string) {
+    const fetchData = async (request: RequestInfo): Promise<any> => {
+      const response = await fetch(request)
+      const body = await response.json()
+      return body
+    }
+    type ReviewData = ReturnType<typeof ReviewData>
+    const response: ReviewData = await fetchData(`http://localhost:8080/search/review/?id=${data}`)
 
-    }, (error) => {
-      console.log('The error is', error)
-    })
+    console.log(response.reviews)
+    this.reviewData = response.reviews;
+    for (let i = 0; i < this.reviewData.length; ++i) {
+      this.reviewData[i].time_created = this.reviewData[i].time_created.slice(0, 10);
+    }
   }
-
 }
 

@@ -3,6 +3,7 @@ import { booking } from '../booking';
 import { faTrashAlt, faTrashCan, faEdit, faClock } from '@fortawesome/free-regular-svg-icons';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Modal } from 'bootstrap';
+import { Either, right, left } from 'fp-ts/lib/Either';
 
 declare let bootstrap: { 
   Carousel: new (arg0: any, arg1: { ride: string; interval: number; }) => any; 
@@ -24,11 +25,52 @@ export class BookingsComponent implements OnInit {
     this.tableControl()
     // reserve info validators
     this.reserveForm = this.formBuilder.group({
-      emailtext: ['', [Validators.required, Validators.email]],
+      emailtext: ['', [Validators.required, this.noSpaceAllow, this.validateAtSign, this.validateAddress, this.validateDomain]],
       datetext: ['', Validators.required],
       hourtext: ['', Validators.required],
       mintext: ['', Validators.required]
     })
+  }
+
+  // Validator
+  noSpaceAllow(control: FormGroup) {
+    if (control.value != null && control.value.indexOf(' ') != -1) {
+      return {noSpaceAllow : true} 
+    }
+    return null
+  }
+
+  // validateAtSign(control: FormGroup): Either<string, boolean> {
+  //   if (!control.value.includes('@')) {
+  //     // return { validateAtSign: true }
+  //     return E.right(true);
+  //     // Email must contain "@" sign
+  //   }
+  //   return E.left('Email must contain "@" sign')
+  // }
+
+  validateAtSign(control: FormGroup) {
+    if (!control.value.includes('@')) {
+      return {validateAtSign : true} 
+      // Email must contain "@" sign
+    }
+    return null
+  }
+
+  validateAddress(control: FormGroup) {
+    if (control.value.split('@')[0]?.length === 0) {
+      return {validateAddress : true} 
+      // Email local-part must be present
+    }
+    return null
+  }
+
+  validateDomain(control: FormGroup) {
+    if (!/\w+\.\w{2,}/ui.test(control.value.split('@')[1])) {
+      return {validateDomain : true}  
+      // Email domain must be in form "example.tld"
+    }
+    return null
   }
 
   // icon
@@ -48,7 +90,7 @@ export class BookingsComponent implements OnInit {
     for (let i = 0, len = localStorage.length; i < len; i++) {
       // get data from localStorage
       let data: any = localStorage.getItem(localStorage.key(i)!);
-      let parse_date = JSON.parse(data || null);
+      let parse_date = JSON.parse(data);
       this.bookings.push(parse_date);
     }
   }

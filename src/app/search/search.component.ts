@@ -1,12 +1,10 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { AppServiceService } from '../app-service.service';
 import { faTwitter, faFacebookSquare } from '@fortawesome/free-brands-svg-icons';
 import { faClock } from '@fortawesome/free-regular-svg-icons';
 import { Modal } from 'bootstrap';
 import { IpInfo } from '../ipinfo';
-import { searchResultData } from '../searchResultData'
-import axios from 'axios';
+// import { searchResultData } from '../searchResultData';
 import { either as E, nonEmptyArray as A } from 'fp-ts';
 import Either = E.Either;
 
@@ -16,26 +14,27 @@ declare let bootstrap: {
 }
 
 // ensure the response is valid
+
 type TypeGuard<T> = (val: unknown) => T;
 const string: TypeGuard<string> = (val: unknown) => {
-  if (typeof val !== 'string') throw new Error();
+  if (typeof val !== 'string') { throw new Error('Invalid string'); }
   return val;
 }
 const number: TypeGuard<number> = (val: unknown) => {
-  if (typeof val !== 'number') throw new Error();
+  if (typeof val !== 'number') { throw new Error('Invalid number'); }
   return val;
 }
 const boolean: TypeGuard<boolean> = (val: unknown) => {
-  if (typeof val !== 'boolean') throw new Error();
+  if (typeof val !== 'boolean') { throw new Error('Invalid boolean'); }
   return val;
 }
 const array = <T>(inner: TypeGuard<T>) => (val: unknown): T[] => {
-  if (!Array.isArray(val)) throw new Error();
+  if (!Array.isArray(val)) { throw new Error('Invalid array'); }
   return val.map(inner);
 }
 const object = <T extends Record<string, TypeGuard<any>>>(inner: T) => {
   return (val: unknown): { [P in keyof T]: ReturnType<T[P]> } => {
-    if (val === null || typeof val !== 'object') throw new Error();
+    if (val === null || typeof val !== 'object') { throw new Error('Invalid object'); }
     const out: { [P in keyof T]: ReturnType<T[P]> } = {} as any;
     for (const k in inner) {
       out[k] = inner[k]((val as any)[k])
@@ -44,6 +43,14 @@ const object = <T extends Record<string, TypeGuard<any>>>(inner: T) => {
   }
 }
 
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) return error.message
+  return String(error)
+}
+
+const reportError = ({ message }: { message: string }) => {
+  // send the error to our logging service...
+}
 
 const AutoComplete = object({
   categories: array(object({
@@ -156,6 +163,13 @@ const ReviewData = object({
   possible_languages: array(string)
 })
 
+// fetch data
+const fetchData = async (request: RequestInfo): Promise<any> => {
+  const response = await fetch(request)
+  const body = await response.json()
+  return body
+}
+
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
@@ -166,7 +180,7 @@ const ReviewData = object({
 
 export class SearchComponent implements OnInit {
 
-  constructor(private service: AppServiceService, private formBuilder: FormBuilder) { }
+  constructor(private formBuilder: FormBuilder) { }
 
   ngOnInit(): void {
     this.findWord()
@@ -195,7 +209,7 @@ export class SearchComponent implements OnInit {
       // return E.right(true);
       // Email must contain "@" sign
     }
-    return E.left('Email must contain "@" sign')
+    return null
   }
 
   validateAddress(control: FormGroup) {
@@ -245,13 +259,6 @@ export class SearchComponent implements OnInit {
   async getAutoComplete(dataFromfindWord: string) {
 
     this.getKeyword(dataFromfindWord)
-
-    const fetchData = async (request: RequestInfo): Promise<any> => {
-      const response = await fetch(request)
-      const body = await response.json()
-      return body
-    }
-
     type AutoComplete = ReturnType<typeof AutoComplete>
 
     const ACData: AutoComplete = await fetchData(`http://localhost:8080/search/autocomplete/?word=${dataFromfindWord}`)
@@ -346,7 +353,6 @@ export class SearchComponent implements OnInit {
     this.part3 = document.getElementById("part3") as HTMLInputElement
     this.part3.style.display = "none"
     this.tabIndex = 0
-    this.action = "Reserve Now"
     this.submitted = false
 
   }
@@ -360,11 +366,6 @@ export class SearchComponent implements OnInit {
 
   async getDataFromAPI(data: string) {
 
-    const fetchData = async (request: RequestInfo): Promise<any> => {
-      const response = await fetch(request)
-      const body = await response.json()
-      return body
-    }
     type SearchResult = ReturnType<typeof SearchResult>
     const result: SearchResult = await fetchData(`http://localhost:8080/search/?${data}`)
 
@@ -444,11 +445,7 @@ export class SearchComponent implements OnInit {
 
 
   async getDetailTable(data: string) {
-    const fetchData = async (request: RequestInfo): Promise<any> => {
-      const response = await fetch(request)
-      const body = await response.json()
-      return body
-    }
+
     type DetailResult = ReturnType<typeof DetailResult>
     const result: DetailResult = await fetchData(`http://localhost:8080/search/businessesDetail/?id=${data}`)
 
@@ -675,33 +672,27 @@ export class SearchComponent implements OnInit {
     console.log(localStorage)
   }
 
-  action: string = 'Reserve Now'
 
   changeButton() {
     if (this.reserveForm.invalid) {
       return
     }
-    if (this.action == 'Reserve Now') {
-      this.action = 'Cancel reservation'
-      alert('Reservation created!')
-      let closeButton: HTMLInputElement = document.getElementById('closeModalB') as HTMLInputElement
-      closeButton.click()
-    }
+
+    alert('Reservation created!')
+    let closeButton: HTMLInputElement = document.getElementById('closeModalB') as HTMLInputElement
+    closeButton.click()
+    
 
   }
 
   // open reserve form
   openBook(name: string) {
-    if (this.action == 'Cancel reservation') {
-      this.action = 'Reserve Now'
-      alert('Reservation cancelled!')
-      localStorage.removeItem(name)
-    } else {
-      let myModal = new bootstrap.Modal(document.getElementById('exampleModal') as HTMLElement, {
-        keyboard: false
-      })
-      myModal?.show()
-    }
+
+    let myModal = new bootstrap.Modal(document.getElementById('exampleModal') as HTMLElement, {
+      keyboard: false
+    })
+    myModal?.show()
+
   }
 
   getShow: HTMLInputElement = document.getElementById("d0") as HTMLInputElement
@@ -740,11 +731,7 @@ export class SearchComponent implements OnInit {
   reviewData: any = []
 
   async getReview(data: string) {
-    const fetchData = async (request: RequestInfo): Promise<any> => {
-      const response = await fetch(request)
-      const body = await response.json()
-      return body
-    }
+
     type ReviewData = ReturnType<typeof ReviewData>
     const response: ReviewData = await fetchData(`http://localhost:8080/search/review/?id=${data}`)
 

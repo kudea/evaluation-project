@@ -143,8 +143,7 @@
                                 </div>
                             </div>
                             <div *ngFor="let detail of detailCard;">
-                                <button #modalButton class="btn" type="button" (click)="openBook(detail.detailName)"
-                                    [ngClass]="action =='Reserve Now' ? 'btn-danger reserveB': 'btn-primary'">{{action}}</button>
+                                <button #modalButton class="btn btn-danger reserveB" type="button" (click)="openBook(detail.detailName)">Reserve Now</button>
                             </div>
                             <br><br>
                             <div class="shareIcon" *ngFor="let detail of detailfb;">

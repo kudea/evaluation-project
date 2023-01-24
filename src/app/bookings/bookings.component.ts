@@ -5,9 +5,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Modal } from 'bootstrap';
 import { Either, right, left } from 'fp-ts/lib/Either';
 
-declare let bootstrap: { 
-  Carousel: new (arg0: any, arg1: { ride: string; interval: number; }) => any; 
-  Modal: new (arg0: HTMLElement | null, arg1: { keyboard: boolean; }) => Modal | undefined; 
+declare let bootstrap: {
+  Carousel: new (arg0: any, arg1: { ride: string; interval: number; }) => any;
+  Modal: new (arg0: HTMLElement | null, arg1: { keyboard: boolean; }) => Modal | undefined;
 }
 declare let window: { location: { href: string; }; }
 
@@ -35,23 +35,14 @@ export class BookingsComponent implements OnInit {
   // Validator
   noSpaceAllow(control: FormGroup) {
     if (control.value != null && control.value.indexOf(' ') != -1) {
-      return {noSpaceAllow : true} 
+      return { noSpaceAllow: true }
     }
     return null
   }
 
-  // validateAtSign(control: FormGroup): Either<string, boolean> {
-  //   if (!control.value.includes('@')) {
-  //     // return { validateAtSign: true }
-  //     return E.right(true);
-  //     // Email must contain "@" sign
-  //   }
-  //   return E.left('Email must contain "@" sign')
-  // }
-
   validateAtSign(control: FormGroup) {
     if (!control.value.includes('@')) {
-      return {validateAtSign : true} 
+      return { validateAtSign: true }
       // Email must contain "@" sign
     }
     return null
@@ -59,7 +50,7 @@ export class BookingsComponent implements OnInit {
 
   validateAddress(control: FormGroup) {
     if (control.value.split('@')[0]?.length === 0) {
-      return {validateAddress : true} 
+      return { validateAddress: true }
       // Email local-part must be present
     }
     return null
@@ -67,7 +58,7 @@ export class BookingsComponent implements OnInit {
 
   validateDomain(control: FormGroup) {
     if (!/\w+\.\w{2,}/ui.test(control.value.split('@')[1])) {
-      return {validateDomain : true}  
+      return { validateDomain: true }
       // Email domain must be in form "example.tld"
     }
     return null
@@ -82,13 +73,11 @@ export class BookingsComponent implements OnInit {
   // for booking table
   bookings: booking[] = []
 
-  // for web storage
-  localStoragedata: any = []
-
   // build booking table
-  getBookingTable(): void {
+  getBookingTable() {
+
     for (let i = 0, len = localStorage.length; i < len; i++) {
-      // get data from localStorage
+      // get all data from localStorage
       let data: any = localStorage.getItem(localStorage.key(i)!);
       let parse_date = JSON.parse(data);
       this.bookings.push(parse_date);
@@ -98,25 +87,13 @@ export class BookingsComponent implements OnInit {
   // cancel reserve form
   delete(name: string) {
     alert('Reservation cancelled!')
-    
-    for (let i = 0; i < this.bookings.length; i++) {
-      if (this.bookings[i].businessname == name) {
-        this.bookings.splice(i, 1)
-        break
-      }
-    }
 
+    let selectedIndexx = this.bookings.findIndex(value => value.businessname == name)
+    this.bookings.splice(selectedIndexx, 1)
     localStorage.removeItem(name)
+
     this.tableControl()
   }
-
-  // isBooking(bookings: booking, name: string) {
-  //   if (bookings.businessname == name) {
-  //     const index = bookings.businessname.indexOf(name, 0);
-  //     this.bookings.splice(index, 1)
-  //   }
-  //   return bookings;
-  // }
 
   // edit reserve form
   reserveForm !: FormGroup
@@ -142,7 +119,7 @@ export class BookingsComponent implements OnInit {
       return
     }
     alert('Reservation edited!')
-    let closeButton : HTMLInputElement = document.getElementById('closeModalB') as HTMLInputElement
+    let closeButton: HTMLInputElement = document.getElementById('closeModalB') as HTMLInputElement
     closeButton.click()
     window.location.href = "/bookings"
   }
@@ -153,15 +130,15 @@ export class BookingsComponent implements OnInit {
     let myModal = new bootstrap.Modal(document.getElementById('exampleModal') as HTMLElement, {
       keyboard: false
     })
-    console.log(name+' is editing!')
+    console.log(name + ' is editing!')
     myModal?.show()
     this.tableControl()
   }
 
 
   tableControl() {
-    let part1 : HTMLInputElement = document.getElementById('part1') as HTMLInputElement
-    let part2 : HTMLInputElement = document.getElementById('part2') as HTMLInputElement
+    let part1: HTMLInputElement = document.getElementById('part1') as HTMLInputElement
+    let part2: HTMLInputElement = document.getElementById('part2') as HTMLInputElement
     if (this.bookings.length == 0) {
       part1.innerHTML = ''
       part2.innerHTML = `<div class="container-sm text-center" style="max-width: 400px; color: red; font-size: 22px;">

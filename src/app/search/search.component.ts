@@ -375,7 +375,7 @@ export class SearchComponent implements OnInit {
       this.part3.style.display = "block"
       // transfer result table distance from meters to miles
       for (let i = 0; i < this.resultTable.length; ++i) {
-        this.resultTable[i]['distance'] = Math.round(parseFloat(this.resultTable[i]['distance']) / 1609);
+        this.resultTable[i].distance = Math.round(parseFloat(this.resultTable[i].distance) / 1609);
       }
 
     } else {

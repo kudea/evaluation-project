@@ -245,6 +245,7 @@ export class SearchComponent implements OnInit {
   findWord() {
     this.myControl.valueChanges.subscribe((response: string | null) => {
       if (response != null) {
+        // make it start AutoComplete function with 2 charactors
         if (response.length > 1) {
           this.wantSpinner = true
           this.getAutoComplete(response)
@@ -258,14 +259,10 @@ export class SearchComponent implements OnInit {
     })
   }
 
-  getKeyword(keyword: string) {
-    this.myKeyword = keyword
-  }
-
   options: Array<string> = ['']
   async getAutoComplete(dataFromfindWord: string) {
 
-    this.getKeyword(dataFromfindWord)
+    this.myKeyword = dataFromfindWord
     type AutoComplete = ReturnType<typeof AutoComplete>
     // try {
     //   const ACData: AutoComplete = await fetchData(`http://localhost:8080/search/autocomplete/?word=${dataFromfindWord}`)

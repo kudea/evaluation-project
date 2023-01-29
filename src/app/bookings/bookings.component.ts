@@ -4,6 +4,7 @@ import { faTrashAlt, faTrashCan, faEdit, faClock } from '@fortawesome/free-regul
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Modal } from 'bootstrap';
 import { Either, right, left } from 'fp-ts/lib/Either';
+import { isEmpty, isNonEmpty } from 'fp-ts/Array'
 
 declare let bootstrap: {
   Carousel: new (arg0: any, arg1: { ride: string; interval: number; }) => any;

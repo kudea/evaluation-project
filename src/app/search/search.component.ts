@@ -4,9 +4,9 @@ import { faTwitter, faFacebookSquare } from '@fortawesome/free-brands-svg-icons'
 import { faClock } from '@fortawesome/free-regular-svg-icons';
 import { Modal } from 'bootstrap';
 import { IpInfo } from '../ipinfo';
-// import { searchResultData } from '../searchResultData';
-import { either as E, nonEmptyArray as A } from 'fp-ts';
-import Either = E.Either;
+import { isEmpty, isNonEmpty } from 'fp-ts/Array'
+import * as O from "fp-ts/lib/Option";
+import * as R from 'fp-ts/lib/Refinement';
 
 declare let bootstrap: {
   Carousel: new (arg0: any, arg1: { ride: string; interval: number; }) => any;
@@ -43,14 +43,7 @@ const object = <T extends Record<string, TypeGuard<any>>>(inner: T) => {
   }
 }
 
-function getErrorMessage(error: unknown) {
-  if (error instanceof Error) return error.message
-  return String(error)
-}
 
-const reportError = ({ message }: { message: string }) => {
-  // send the error to our logging service...
-}
 
 const AutoComplete = object({
   categories: array(object({
@@ -163,6 +156,20 @@ const ReviewData = object({
   possible_languages: array(string)
 })
 
+type SuccessResponse = {success: true, payload: typeof AutoComplete}
+type FailureResponse = {success: false, error: Error}
+type ApiResponse = SuccessResponse | FailureResponse
+
+const parseSuccessResponse = (res: ApiResponse): O.Option<SuccessResponse> => res.success === true ? O.some(res) : O.none
+const isSuccessResponse = R.fromOptionK(parseSuccessResponse)
+const handleApiResponse = (response: ApiResponse) => {
+  if(isSuccessResponse(response)) {
+    return response.payload // The type of response is inferred to be SuccessResponse
+  }
+  // The type of response is inferred to be FailureResponse
+  throw new Error(response.error.message || 'Something went wrong')
+}
+
 // fetch data
 const fetchData = async (request: RequestInfo): Promise<any> => {
   const response = await fetch(request)
@@ -260,16 +267,21 @@ export class SearchComponent implements OnInit {
 
     this.getKeyword(dataFromfindWord)
     type AutoComplete = ReturnType<typeof AutoComplete>
-
+    // try {
+    //   const ACData: AutoComplete = await fetchData(`http://localhost:8080/search/autocomplete/?word=${dataFromfindWord}`)
+    //   return handleApiResponse({success: true, payload: ACData})
+    // } catch(error) {
+    //   handleApiResponse({success: false, error: error instanceof Error ? error : new Error('unknown error')})
+    // }
     const ACData: AutoComplete = await fetchData(`http://localhost:8080/search/autocomplete/?word=${dataFromfindWord}`)
     this.options.length = 0
     this.wantSpinner = false
-    if (Array.isArray(ACData.categories)) {
+    if (isNonEmpty(ACData.categories)) {
       for (let i = 0; i < ACData.categories.length; i++) {
         this.options.push(ACData.categories[i].title)
       }
     }
-    if (Array.isArray(ACData.terms)) {
+    if (isNonEmpty(ACData.terms)) {
       for (let i = 0; i < ACData.terms.length; i++) {
         this.options.push(ACData.terms[i].text)
       }
@@ -479,7 +491,7 @@ export class SearchComponent implements OnInit {
       d_1NeedHide = true
     }
     else {
-      if (Array.isArray(response.categories)) {
+      if (isNonEmpty(response.categories)) {
         if (response.location.display_address.length != 0) {
           for (let k = 0; k < response.location.display_address.length; k++) {
             d_address += response.location.display_address[k] + ' '
@@ -515,7 +527,7 @@ export class SearchComponent implements OnInit {
       d_4NeedHide = true
     }
     else {
-      if (Array.isArray(response.categories)) {
+      if (isNonEmpty(response.categories)) {
         if (response.categories.length != 0) {
           for (let j = 0; j < response.categories.length; j++) {
             d_cate += response.categories[j].title
@@ -742,4 +754,3 @@ export class SearchComponent implements OnInit {
     }
   }
 }
-

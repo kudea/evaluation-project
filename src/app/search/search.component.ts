@@ -156,14 +156,14 @@ const ReviewData = object({
   possible_languages: array(string)
 })
 
-type SuccessResponse = {success: true, payload: typeof AutoComplete}
-type FailureResponse = {success: false, error: Error}
+type SuccessResponse = { success: true, payload: typeof AutoComplete }
+type FailureResponse = { success: false, error: Error }
 type ApiResponse = SuccessResponse | FailureResponse
 
 const parseSuccessResponse = (res: ApiResponse): O.Option<SuccessResponse> => res.success === true ? O.some(res) : O.none
 const isSuccessResponse = R.fromOptionK(parseSuccessResponse)
 const handleApiResponse = (response: ApiResponse) => {
-  if(isSuccessResponse(response)) {
+  if (isSuccessResponse(response)) {
     return response.payload // The type of response is inferred to be SuccessResponse
   }
   // The type of response is inferred to be FailureResponse
@@ -471,13 +471,13 @@ export class SearchComponent implements OnInit {
     d_tableDetail.style.display = "block"
 
 
-    let statusInt = 0
-    let d_1NeedHide = false
-    let d_2NeedHide = false
-    let d_3NeedHide = false
-    let d_4NeedHide = false
-    let d_5NeedHide = false
-    let d_6NeedHide = false
+    let statusInt: number = 0
+    let d_1NeedHide: boolean = false
+    let d_2NeedHide: boolean = false
+    let d_3NeedHide: boolean = false
+    let d_4NeedHide: boolean = false
+    let d_5NeedHide: boolean = false
+    let d_6NeedHide: boolean = false
 
     this.detailData.name = response.name
     this.detailfb[0].twitterName = response.name
@@ -506,7 +506,8 @@ export class SearchComponent implements OnInit {
     let d_phone: string = ""
     if (response.display_phone == undefined) {
       d_2NeedHide = true
-    } else {
+    } 
+    else {
       d_phone = response.display_phone
     }
 
@@ -528,17 +529,15 @@ export class SearchComponent implements OnInit {
     }
     else {
       if (isNonEmpty(response.categories)) {
-        if (response.categories.length != 0) {
-          for (let j = 0; j < response.categories.length; j++) {
-            d_cate += response.categories[j].title
-            if (j < response.categories.length - 1) {
-              d_cate += " | "
-            }
+        for (let j = 0; j < response.categories.length; j++) {
+          d_cate += response.categories[j].title
+          if (j < response.categories.length - 1) {
+            d_cate += " | "
           }
         }
-        else {
-          d_4NeedHide = true
-        }
+      }
+      else {
+        d_4NeedHide = true
       }
     }
 
@@ -693,7 +692,7 @@ export class SearchComponent implements OnInit {
     alert('Reservation created!')
     let closeButton: HTMLInputElement = document.getElementById('closeModalB') as HTMLInputElement
     closeButton.click()
-    
+
 
   }
 

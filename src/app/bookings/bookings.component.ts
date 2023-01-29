@@ -89,8 +89,8 @@ export class BookingsComponent implements OnInit {
   delete(name: string) {
     alert('Reservation cancelled!')
 
-    let selectedIndexx = this.bookings.findIndex(value => value.businessname == name)
-    this.bookings.splice(selectedIndexx, 1)
+    let selectedIndex = this.bookings.findIndex(value => value.businessname == name)
+    this.bookings.splice(selectedIndex, 1)
     localStorage.removeItem(name)
 
     this.tableControl()
@@ -140,7 +140,7 @@ export class BookingsComponent implements OnInit {
   tableControl() {
     let part1: HTMLInputElement = document.getElementById('part1') as HTMLInputElement
     let part2: HTMLInputElement = document.getElementById('part2') as HTMLInputElement
-    if (this.bookings.length == 0) {
+    if (isEmpty(this.bookings)) {
       part1.innerHTML = ''
       part2.innerHTML = `<div class="container-sm text-center" style="max-width: 400px; color: red; font-size: 22px;">
       <div style="border-radius: 30px; background-color: white;">No reservations to show</div>

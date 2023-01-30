@@ -4,7 +4,7 @@ import { faTwitter, faFacebookSquare } from '@fortawesome/free-brands-svg-icons'
 import { faClock } from '@fortawesome/free-regular-svg-icons';
 import { Modal } from 'bootstrap';
 import { IpInfo } from '../ipinfo';
-import { isEmpty, isNonEmpty } from 'fp-ts/Array'
+import { isEmpty, isNonEmpty } from 'fp-ts/Array';
 import * as O from "fp-ts/lib/Option";
 import * as R from 'fp-ts/lib/Refinement';
 
@@ -156,6 +156,7 @@ const ReviewData = object({
   possible_languages: array(string)
 })
 
+// use Typeguard to replace it
 type SuccessResponse = { success: true, payload: typeof AutoComplete }
 type FailureResponse = { success: false, error: Error }
 type ApiResponse = SuccessResponse | FailureResponse
@@ -164,7 +165,7 @@ const parseSuccessResponse = (res: ApiResponse): O.Option<SuccessResponse> => re
 const isSuccessResponse = R.fromOptionK(parseSuccessResponse)
 const handleApiResponse = (response: ApiResponse) => {
   if (isSuccessResponse(response)) {
-    return response.payload // The type of response is inferred to be SuccessResponse
+    return response // The type of response is inferred to be SuccessResponse
   }
   // The type of response is inferred to be FailureResponse
   throw new Error(response.error.message || 'Something went wrong')

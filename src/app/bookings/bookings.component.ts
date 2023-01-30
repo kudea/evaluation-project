@@ -3,14 +3,32 @@ import { booking } from '../booking';
 import { faTrashAlt, faTrashCan, faEdit, faClock } from '@fortawesome/free-regular-svg-icons';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Modal } from 'bootstrap';
-import { Either, right, left } from 'fp-ts/lib/Either';
-import { isEmpty, isNonEmpty } from 'fp-ts/Array'
+import { isEmpty, isNonEmpty } from 'fp-ts/Array';
+import { Either, left, right } from 'fp-ts/Either'
+import { chain } from 'fp-ts/Either'
+import { pipe } from 'fp-ts/function'
+
+const noSpace = (s: string): Either<string, string> =>
+  s.indexOf(' ') == -1 ? right(s) : left('No Space Allow')
+
+const formatCheck = (s: string): Either<string, string> =>
+  s.match(
+    /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  ) ? right(s) : left('Invalid Email Format')
+
+const validateEmail = (s: string): Either<string, string> =>
+  pipe(
+    noSpace(s),
+    chain(formatCheck)
+  )
 
 declare let bootstrap: {
   Carousel: new (arg0: any, arg1: { ride: string; interval: number; }) => any;
   Modal: new (arg0: HTMLElement | null, arg1: { keyboard: boolean; }) => Modal | undefined;
 }
 declare let window: { location: { href: string; }; }
+
+// === — strict equality (triple equals); == — loose equality (double equals)
 
 @Component({
   selector: 'app-bookings',
@@ -33,7 +51,7 @@ export class BookingsComponent implements OnInit {
     })
   }
 
-  // Validator
+  // Customize Validator from angular form
   noSpaceAllow(control: FormGroup) {
     if (control.value != null && control.value.indexOf(' ') != -1) {
       return { noSpaceAllow: true }
@@ -100,17 +118,36 @@ export class BookingsComponent implements OnInit {
   reserveForm !: FormGroup
   submitted: boolean = false
 
-  toBooking(name: string) {
+  // open edit reserve form
+  editingName: string = ''
+  edit(name: string) {
+
+    let myModal = new bootstrap.Modal(document.getElementById('exampleModal') as HTMLElement, {
+      keyboard: false
+    })
+    console.log(name + ' is editing!')
+    this.editingName = name
+    myModal?.show()
+    this.tableControl()
+  }
+
+  toBooking() {
     this.submitted = true
     if (this.reserveForm.invalid) {
       return
     }
-    this.getBooking(this.reserveForm.value, name)
+    this.getBooking(this.reserveForm.value, this.editingName)
   }
 
   getBooking(data: any, name: string) {
-
-    localStorage.setItem(name, JSON.stringify({ businessname: name, emailtext: data.emailtext, datetext: data.datetext, hourtext: data.hourtext, mintext: data.mintext }))
+    let checkedEmail = validateEmail(data.emailtext)
+    if (checkedEmail._tag == 'Right') {
+      localStorage.setItem(name, JSON.stringify({ businessname: name, emailtext: checkedEmail.right, datetext: data.datetext, hourtext: data.hourtext, mintext: data.mintext }))
+    }
+    else {
+      console.error(checkedEmail)
+    }
+    
     console.log(localStorage)
   }
 
@@ -125,18 +162,7 @@ export class BookingsComponent implements OnInit {
     window.location.href = "/bookings"
   }
 
-  // open edit reserve form
-  edit(name: string) {
-
-    let myModal = new bootstrap.Modal(document.getElementById('exampleModal') as HTMLElement, {
-      keyboard: false
-    })
-    console.log(name + ' is editing!')
-    myModal?.show()
-    this.tableControl()
-  }
-
-
+  // Action when localStorage is empty
   tableControl() {
     let part1: HTMLInputElement = document.getElementById('part1') as HTMLInputElement
     let part2: HTMLInputElement = document.getElementById('part2') as HTMLInputElement
